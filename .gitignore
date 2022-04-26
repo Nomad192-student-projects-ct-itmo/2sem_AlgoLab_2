@@ -1,0 +1,10 @@
+*
+!*/
+!*.c
+!*.cpp
+!*.md
+!CMakeLists.txt
+!/.gitignore
+cmake-build-debug/
+debug/
+build/
