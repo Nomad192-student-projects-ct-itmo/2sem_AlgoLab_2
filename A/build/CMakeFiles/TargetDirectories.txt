@@ -1,3 +1,0 @@
-C:/Users/Veren/Desktop/GitRepo/2sem_AlgoLab_2/A/build/CMakeFiles/A.dir
-C:/Users/Veren/Desktop/GitRepo/2sem_AlgoLab_2/A/build/CMakeFiles/edit_cache.dir
-C:/Users/Veren/Desktop/GitRepo/2sem_AlgoLab_2/A/build/CMakeFiles/rebuild_cache.dir
