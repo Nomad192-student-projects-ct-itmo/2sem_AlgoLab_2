@@ -1,6 +1,6 @@
 #include <cstdio>
 
-//#define TEST
+#define TEST
 #ifdef TEST
 	#include <cstdlib>
 	#define TEST_LEN_ARR (100)
@@ -8,9 +8,79 @@
 #endif
 
 
-//#define AVL
-#ifdef AVL
+#define AVL_TREE
 
+#ifdef AVL_TREE
+	class AVL
+	{
+	private:
+		typedef unsigned int T;
+		#define IND_NEU_VAL (size_t)(-2)
+		//#define DATA_NEU_VAL (T)(0)
+		#define DATA_SP "u"
+		#define IND_SP "d"
+		struct Node
+		{
+			T x;
+			size_t l;
+			size_t r;
+		};
+		size_t n;
+		struct Node *data;
+		size_t current_add;
+	public:
+		AVL(size_t n) : n(n), data(new struct Node[n]), current_add(0) {}
+		~AVL() {delete[] data;}
+
+		void add(T x)
+		{
+			if(current_add == 0)
+			{
+				data[current_add++] = Node{x, IND_NEU_VAL, IND_NEU_VAL};
+				return;
+			}
+			add_rq(0, x);
+		}
+		void full_print()
+		{
+			printf("%zu\n", n);
+			for(size_t i = 0; i < current_add; i++)
+				printf("%" DATA_SP " %" IND_SP " %" IND_SP "\n", data[i].x, data[i].l+1, data[i].r+1);
+			printf("%d", 0+1);
+		}
+
+	private:
+		friend bool test(class AVL &bst, class AlmostTree &tree);
+		void add_rq(size_t el, T &x)
+		{
+			if(x < data[el].x && data[el].l == IND_NEU_VAL)
+			{
+				if(data[el].r != IND_NEU_VAL)
+				{
+					data[current_add] = data[data[el].r];
+					data[data[el].r] = Node{x, IND_NEU_VAL, IND_NEU_VAL};
+					data[el].l = data[el].r;
+					data[el].r = current_add;
+				}
+				else
+				{
+					data[current_add] = Node{x, IND_NEU_VAL, IND_NEU_VAL};
+					data[el].l = current_add;
+				}
+				
+				current_add++;
+				return;
+			}
+			if(x > data[el].x && data[el].r == IND_NEU_VAL)
+			{
+				data[current_add] = Node{x, IND_NEU_VAL, IND_NEU_VAL};
+				data[el].r = current_add++;
+				return;
+			}
+
+			add_rq(x < data[el].x ? data[el].l : data[el].r, x);
+		}
+	};
 #else
 	class BST
 	{
@@ -139,7 +209,11 @@
 		}
 	};
 
+#ifdef AVL_TREE
+	bool test(class AVL &bst, class AlmostTree &tree)
+#else
 	bool test(class BST &bst, class AlmostTree &tree)
+#endif
 	{
 		for (size_t i = 0; i < bst.current_add; i++)
 			tree.add({bst.data[i].x, bst.data[i].l, bst.data[i].r});
@@ -157,7 +231,12 @@
 
 	    	for(size_t n_attempt = 0; n_attempt < TEST_N; n_attempt++)
 	        {
-		    	BST bst(length);
+#ifdef AVL_TREE
+				AVL bst(length);
+#else
+				BST bst(length);
+#endif
+
 		    	AlmostTree tree(length);
 		    	for (size_t i = 0; i < length; i++)
 		    	{
@@ -200,7 +279,12 @@ int main()
     size_t n;
 	scanf("%zu\n", &n);
 
+#ifdef AVL_TREE
+	AVL bst(n);
+#else
 	BST bst(n);
+#endif
+
 
 	while(n--)
 	{
