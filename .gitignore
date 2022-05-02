@@ -5,6 +5,7 @@
 !*.md
 !CMakeLists.txt
 !/.gitignore
+!run.cmd
 cmake-build-debug/
 debug/
 build/
