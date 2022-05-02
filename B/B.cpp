@@ -422,7 +422,7 @@ cmake --build . && (echo START & B)
 echo return code: %errorlevel%
 
 * or
-..\..\run B
+..\..\run_cmake\run
 
 * move
 cd 2sem_AlgoLab_2\B\build

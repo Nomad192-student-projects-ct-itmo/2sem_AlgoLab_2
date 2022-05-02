@@ -4,4 +4,4 @@ project(B)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(B B.cpp)
+add_executable(${PROJECT_NAME} B.cpp)
