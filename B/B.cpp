@@ -426,4 +426,8 @@ echo return code: %errorlevel%
 
 * move
 cd 2sem_AlgoLab_2\B\build
+cd B\build
+
+* update run_cmake
+git submodule update --remote
 */
