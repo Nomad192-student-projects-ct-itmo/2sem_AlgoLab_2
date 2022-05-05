@@ -17,35 +17,40 @@ class AVL
 {
 private:
 	typedef unsigned int T;
-	#define IND_NEU_VAL (size_t)(-2)
 	#define DATA_SP "u"
-	#define IND_SP "d"
 	struct Node
 	{
 		T x;
-		size_t l;
-		size_t r;
 		signed char b;
-	};
-	size_t n;
-	struct Node *data;
-	size_t current_add;
-public:
-	AVL(size_t n) : n(n), data(new struct Node[n]), current_add(0) {}
-	~AVL() {delete[] data;}
+		Node *l = nullptr;
+		Node *r = nullptr;
 
-	void add(T x)
-	{
-		if(current_add == 0)
+		Node(T &x) : x(x), b(0) {}
+		~Node()
 		{
-			data[current_add++] = Node{x, IND_NEU_VAL, IND_NEU_VAL, 0};
+			delete l;
+			delete r;
+		}
+	};
+	size_t n = 0;
+	Node *root = nullptr;
+public:
+	~AVL() {delete root;}
+
+	void insert(T x)
+	{
+		n++;
+		if(root == nullptr)
+		{
+			root = new Node{x, IND_NEU_VAL, IND_NEU_VAL, 0};
 			return;
 		}
-		add_rq(0, x);
+		insert_rq(0, x);
 		balancing();
 	}
 	void full_print()
 	{
+
 		printf("%zu\n", n);
 		for(size_t i = 0; i < current_add; i++)
 			printf("%" DATA_SP " %" IND_SP " %" IND_SP "\n", data[i].x, data[i].l+1, data[i].r+1);
@@ -54,6 +59,23 @@ public:
 
 private:
 	friend bool test(class AVL &, class AlmostTree &);
+	void full_print_rq(Node *cur, size_t ind)
+	{
+		if(cur == nullptr) return;
+		printf("%zu - %" DATA_SP " % hhd - %zu %zu\n", ind, cur.x, cur.b, ind*2, (ind*2)+1);
+		if(cur.l == nullptr)
+		{
+			printf("-1");
+
+			if(cur.r == nullptr)
+				printf("-1");
+			else
+				printf("%zu\n", ind*2); 
+		}
+		else
+			printf()
+		full_print_rq(cur.)
+	}
 	void swap(size_t i, size_t j)
 	{
 		Node buf = data[i];
@@ -396,7 +418,7 @@ int main()
 mkdir build & cd build & cmake -G "MinGW Makefiles" ..
 
 * build and run
-cmake --build . && (echo START & B)
+cmake --build . && (echo START & C)
 echo return code: %errorlevel%
 
 * or
