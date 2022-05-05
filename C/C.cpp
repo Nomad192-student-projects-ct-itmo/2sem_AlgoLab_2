@@ -21,11 +21,11 @@ private:
 	struct Node
 	{
 		T x;
-		signed char b;
+		signed char b = 0;
 		Node *l = nullptr;
 		Node *r = nullptr;
 
-		Node(T &x) : x(x), b(0) {}
+		Node(T &x) : x(x) {}
 		~Node()
 		{
 			delete l;
@@ -39,54 +39,58 @@ public:
 
 	void insert(T x)
 	{
-		n++;
 		if(root == nullptr)
 		{
-			root = new Node{x, IND_NEU_VAL, IND_NEU_VAL, 0};
+			root = new Node{x};
+            n++;
 			return;
 		}
-		insert_rq(0, x);
-		balancing();
+		insert_rq(root, x);
+		//balancing();
 	}
 	void full_print()
 	{
 
-		printf("%zu\n", n);
-		for(size_t i = 0; i < current_add; i++)
-			printf("%" DATA_SP " %" IND_SP " %" IND_SP "\n", data[i].x, data[i].l+1, data[i].r+1);
-		printf("%d", 0+1);
+		printf("n = %zu\n", n);
+        size_t ind = 0;
+        full_print_rq(root,ind);
+		printf("%d\n", 1);
 	}
 
 private:
 	friend bool test(class AVL &, class AlmostTree &);
-	void full_print_rq(Node *cur, size_t ind)
+	void full_print_rq(Node *cur, size_t &ind)
 	{
 		if(cur == nullptr) return;
-		printf("%zu - %" DATA_SP " % hhd - %zu %zu\n", ind, cur.x, cur.b, ind*2, (ind*2)+1);
-		if(cur.l == nullptr)
-		{
-			printf("-1");
 
-			if(cur.r == nullptr)
-				printf("-1");
-			else
-				printf("%zu\n", ind*2); 
-		}
-		else
-			printf()
-		full_print_rq(cur.)
+        ind++;
+        printf("%-2zu - %2" DATA_SP " %2hhd -", ind, cur->x, cur->b);
+        if(cur->l)
+        {
+            printf(" (%2d)", ind + 1);
+        }
+        else
+            printf(" (-1)");
+        if(cur->r)
+            printf(" (%2d)", ind + 1 + (cur->l != nullptr));
+        else
+            printf(" (-1)");
+        printf("\n");
+
+        full_print_rq(cur->l, ind);
+		full_print_rq(cur->r,ind);
 	}
-	void swap(size_t i, size_t j)
+	/*static void swap(Node *a, Node *b)
 	{
-		Node buf = data[i];
-		data[i] = data[j];
-		data[j] = buf;
+		Node buf = *a;
+		*a = *b;
+		*b = buf;
 	}
-	void swap_val(size_t i, size_t j)
+    static void swap_val(Node *a, Node *b)
 	{
-		T x = data[i].x;
-		data[i].x = data[j].x;
-		data[j].x = x;
+		T x = a->x;
+		a->x = b->x;
+		b->x = x;
 	}
 	void swap_lr(size_t el)
 	{
@@ -165,7 +169,7 @@ private:
 	}
 	void balancing()
 	{
-		if(data[0].b == -2)
+		if(root->b == -2)
 		{
 			if(data[data[0].r].b == -1)
 			{
@@ -193,27 +197,34 @@ private:
 				return;
 			}
 		}
-	}
-	void add_rq(size_t el, T &x)
+	}*/
+	void insert_rq(Node *el, T &x)
 	{
-		if(x < data[el].x && data[el].l == IND_NEU_VAL)
+        Node *next;
+		if(x < el->x)
 		{
-			data[current_add] = Node{x, IND_NEU_VAL, IND_NEU_VAL, 0};
-			data[el].l = current_add++;
-			check_rl(el);
-			data[el].b++;
-			return;
+            el->b++;
+            if(el->l == nullptr)
+            {
+                el->l = new Node{x};
+                n++;
+                return;
+            }
+            next = el->l;
 		}
-		if(x > data[el].x && data[el].r == IND_NEU_VAL)
+		else if(x > el->x)
 		{
-			data[current_add] = Node{x, IND_NEU_VAL, IND_NEU_VAL, 0};
-			data[el].r = current_add++;
-			data[el].b--;
-			return;
-		}
+            el->b--;
+            if(el->r == nullptr)
+            {
+                el->r = new Node{x};
+                n++;
+                return;
+            }
+            next = el->r;
+		} else return;  ///x == el.x
 
-		x < data[el].x ? data[el].b++ : data[el].b--;
-		add_rq(x < data[el].x ? data[el].l : data[el].r, x);
+        insert_rq(next, x);
 	}
 };
 
@@ -342,21 +353,21 @@ static bool eq_str(const char a[], const char b[])
 	return false;
 }
 
-typedef unsigned long int ht;
+typedef unsigned long int hash_type;
 
-static constexpr ht hash_str(const char str[])
+static constexpr hash_type hash_str(const char str[])
 {
-	ht result=0;
+    hash_type result=0;
 	for(size_t i=0, m=1; str[i]!='\0'; i++, m*=131)
 		result += (str[i]*m);
 	return result;
 }
 
-constexpr ht insert_hash =  hash_str("insert");
-constexpr ht delete_hash =  hash_str("delete");
-constexpr ht exists_hash =  hash_str("exists");
-constexpr ht next_hash =  hash_str("next");
-constexpr ht prev_hash =  hash_str("prev");
+constexpr hash_type insert_hash =  hash_str("insert");
+constexpr hash_type delete_hash =  hash_str("delete");
+constexpr hash_type exists_hash =  hash_str("exists");
+constexpr hash_type next_hash   =  hash_str("next");
+constexpr hash_type prev_hash   =  hash_str("prev");
 
 int main()
 {
@@ -367,7 +378,7 @@ int main()
 
     size_t n = 100;
 
-	AVL avl(n);
+	AVL avl;
 
 	for(char op[7]; scanf("%6s", op) != EOF && n--;)
 	{
@@ -375,7 +386,10 @@ int main()
 		{
 			case insert_hash:
 			{
-				printf("1\n");
+				printf("insert\n");
+                unsigned int x;
+                scanf("%u", &x);
+                avl.insert(x);
 				break;
 			}
 			case delete_hash:
@@ -400,14 +414,16 @@ int main()
 			}
 			default:
 			{
-				printf("Error: unknown command!\n");
+                if(op[0] == '^' && op[1] == 'Z')
+                    return 0;
+				printf("Error: unknown command - \"%s\"!\n", op);
 				return -1;
 			}
 		}
 		// unsigned int x;
 		// scanf("%u", &x);
 		// avl.add(x);
-		// avl.full_print();
+		avl.full_print();
 	}
 	return 0;
 }
