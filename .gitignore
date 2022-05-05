@@ -1,12 +1,11 @@
 *
-!*/
 !*.c
 !*.cpp
 !*.md
 !CMakeLists.txt
-!.git*
+!.git*/
 !run.cmd
 !run_cmake
-cmake-build-debug/
-debug/
-build/
+cmake-build-debug
+debug
+build
