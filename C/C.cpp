@@ -2,22 +2,24 @@
 
 #define MIN(x, y) ((x < y) ? (x) : (y))
 
-//#define TEST
+#define TREE_TYPE unsigned int
+#define TREE_TYPE_SP "u"
+
+#define TEST
 #ifdef TEST
 	#include <cstdlib>
-	//#define TEST_LEN_ARR (10)
-	//#define N_TEST (1000000)
-	//#define N_TEST_POINT MIN((10), TEST_LEN_ARR)
-	//#define RANGE_VAL (1000000000) 
-	//#define OFFSET_VAL (1)
+	#define TEST_LEN_ARR (10)
+	#define N_TEST (1000000)
+	#define N_TEST_POINT MIN((10), TEST_LEN_ARR)
+	#define RANGE_VAL (1000000000) 
+	#define OFFSET_VAL (1)
 #endif
 
 
 class AVL
 {
 private:
-	typedef unsigned int T;
-	#define DATA_SP "u"
+	typedef TREE_TYPE T;
 	struct Node
 	{
 		T x;
@@ -58,23 +60,26 @@ public:
 	}
 
 private:
-	friend bool test(class AVL &, class AlmostTree &);
+	friend bool test(class AVL &avl, size_t length);
 	void full_print_rq(Node *cur, size_t &ind)
 	{
 		if(cur == nullptr) return;
 
         ind++;
-        printf("%-2zu - %2" DATA_SP " %2hhd -", ind, cur->x, cur->b);
+        
+        //printf("%-2zu - %2" DATA_SP " %2hhd -", ind, cur->x, cur->b);
+        printf("%" TREE_TYPE_SP, ind, cur->x);
+
         if(cur->l)
         {
-            printf(" (%2d)", ind + 1);
+            printf(" %d", ind + 1);
         }
         else
-            printf(" (-1)");
+            printf(" -1");
         if(cur->r)
-            printf(" (%2d)", ind + 1 + (cur->l != nullptr));
+            printf(" %d", ind + 1 + (cur->l != nullptr));
         else
-            printf(" (-1)");
+            printf(" -1");
         printf("\n");
 
         full_print_rq(cur->l, ind);
@@ -183,7 +188,7 @@ private:
 				return;
 			}
 		}
-		if(data[0].b == 2)
+		if(root.b == 2)
 		{
 			if(data[data[0].l].b == 1)
 			{
@@ -232,73 +237,155 @@ private:
 	class AlmostTree
 	{
 	private:
-		typedef unsigned int T;
-	public:
+		typedef TREE_TYPE T;
 		struct Node
 		{
 			T x;
-			size_t l;
-			size_t r;
+			Node *next = nullptr;
+
+			Node(T x) : x(x) {}
 		};
-	private:
-		size_t n;
-		size_t current_add;
-		Node *data;
+		size_t n = 0;
+		Node *first = nullptr;
 
-	public:
-		AlmostTree(size_t n) : n(n), data(new Node[n]), current_add(0) {}
-		~AlmostTree() {delete[] data;}
-
-		void add(Node v)
+		~List()
 		{
-			if (current_add >= n) return;
-
-			data[current_add++] = v;
+			Node *cur = first;
+			while(cur)
+			{
+				Node *next = cur->next;
+				delete cur;
+				cur = next;
+			}
 		}
 
-		bool check(size_t root)
+		void insert(T x)
 		{
-			return check_rq(root);
+			Node *cur = start;
+			while(cur)
+			{
+				if(cur->x == x) {return;}
+				if(cur->next != nullptr)
+				{
+					cur->next = new Node(x);
+					n++;
+					return;
+				}
+			}
+			start.next = new Node(x);
+			n++;
 		}
-		void print()
+		void del(T x)
 		{
-			printf("Tree(");
-			for(size_t i = 0; i < n - 1; i++)
-				printf("%u, ", data[i].x);
-			printf("%u)\n", data[n-1].x);
+			Node *cur = start;
+			while(cur)
+			{
+				if(cur->next && cur->next->x) {
+					cur->next = cur->next->next;
+					delete cur->next;
+					n--;
+					return;
+				}
+			}
+			if(start.x == x)
+			{
+				delete start;
+				n--;
+				start = nullptr;
+			}
 		}
-	private:
-		bool check_rq(size_t el)
+		bool exists(T x)
 		{
-			if(el == -2) return true;
-
-			if(data[el].l != -2 && data[data[el].l].x >= data[el].x)
-				return false;
-
-			if(data[el].r != -2 && data[data[el].r].x <= data[el].x)
-				return false;
-
-			return check_rq(data[el].l) && check_rq(data[el].r);
+			Node *cur = start;
+			while(cur)
+			{
+				if(cur.x == x)
+					return true;
+				cur = cur->next;
+			}
+			return false;
+		}
+		bool next(T x, T *next)
+		{
+			Node *cur = start;
+			T min = x;
+			while(cur)
+			{
+				if (cur->x > x)
+				{
+					min = cur->x
+					cur = cur->next;
+					break;
+				}
+				cur = cur->next;
+			}
+			if(min == x) {return false;}
+			while(cur)
+			{
+				if (cur->x > x && cur->x < min)
+					min = cur->x
+				cur = cur->next;
+			}
+			if(min == x) {return false;}
+			*next = min;
+			return true;
+		}
+		bool prev(T x, T *prev)
+		{
+			Node *cur = start;
+			T max = x;
+			while(cur)
+			{
+				if (cur->x < x)
+				{
+					max = cur->x
+					cur = cur->next;
+					break;
+				}
+				cur = cur->next;
+			}
+			if(max == x) {return false;}
+			while(cur)
+			{
+				if (cur->x < x && cur->x > max)
+					max = cur->x
+				cur = cur->next;
+			}
+			if(max == x) {return false;}
+			*next = max;
+			return true;
 		}
 	};
 
-#ifdef AVL_TREE
-	bool test(class AVL &bst, class AlmostTree &tree)
-#else
-	bool test(class BST &bst, class AlmostTree &tree)
-#endif
+	bool test(class AVL &avl, size_t length)
 	{
-		for (size_t i = 0; i < bst.current_add; i++)
+		AlmostTree tree(length);
+		for (size_t i = 0; i < avl.n; i++)
 		{
-			if(bst.data[i].l > bst.data[i].r && (bst.data[i].l != -2 && bst.data[i].r != -2))
+			if(avl.data[i].l > avl.data[i].r && (avl.data[i].l != -2 && avl.data[i].r != -2))
 				return false; 
-			tree.add({bst.data[i].x, bst.data[i].l, bst.data[i].r});
+			tree.add({avl.data[i].x, avl.data[i].l, avl.data[i].r});
 		}
 		return tree.check(0);
 	}
 	bool full_test()
 	{
-		unsigned int data[TEST_LEN_ARR];
+		struct Req
+		{
+			enum Type
+			{
+				INSERT,
+				DELETE,
+				EXISTS,
+				NEXT,
+				PREV,  
+			};
+			Type type;
+			TREE_TYPE x;
+
+			Req(Type type, TREE_TYPE x) : type(type), x(x) {}
+		};
+		Req req_arr[TEST_LEN_ARR];
 		for (size_t length = 1; length <= TEST_LEN_ARR; length++)
 	    {
 	    	if((length-1) % (TEST_LEN_ARR/N_TEST_POINT) == 0)
@@ -306,13 +393,22 @@ private:
 
 	    	for(size_t n_attempt = 0; n_attempt < N_TEST; n_attempt++)
 	        {
-#ifdef AVL_TREE
-				AVL bst(length);
-#else
-				BST bst(length);
-#endif
+	        	AVL tree;
+	        	AlmostTree test;
 
-		    	AlmostTree tree(length);
+	        	for(size_t i = 0; i < length; i++)
+	        	{
+	        		data[i] = Req(rand % 5, (rand() % RANGE_VAL) + OFFSET_VAL);
+	        		switch(data[i].type)
+	        		{
+	        			case INSERT: {tree.insert(data[i].x); test.insert(data[i].x); break;}
+
+	        			case EXISTS: {};
+
+	        		}
+	        	}
+				/*AVL avl(length);
+
 		    	for (size_t i = 0; i < length; i++)
 		    	{
 		    		data[i] = (rand() % RANGE_VAL) + OFFSET_VAL;
@@ -324,9 +420,9 @@ private:
 		    				y = -1;
 		    			}
 		    		}
-		    		bst.add(data[i]);
+		    		avl.insert(data[i]);
 		    	}
-		    	if(!test(bst, tree))
+		    	if(!test(avl, length))
 		    	{
 		    		printf("Error with data:\n");
 		    		printf("%d\n", length);
@@ -335,9 +431,9 @@ private:
 			    		printf("%u ", data[i]);
 			    	}
 			    	printf("\nBST full print:\n");
-			    	bst.full_print();
+			    	avl.full_print();
 			    	return false;
-		    	}
+		    	}*/
 	    	}
 	    }
 	    printf("	len test 100%% - OK\n");
@@ -345,13 +441,13 @@ private:
 	}
 #endif
 
-static bool eq_str(const char a[], const char b[])
+/*static bool eq_str(const char a[], const char b[])
 {
 	for(size_t i = 0; a[i] == b[i]; i++)
 		if(a[i]=='\0' && b[i]=='\0')
 			return true;	
 	return false;
-}
+}*/
 
 typedef unsigned long int hash_type;
 
