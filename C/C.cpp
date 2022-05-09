@@ -1,4 +1,7 @@
 #include <cstdio>
+#include <iostream>
+#include <string>
+#include <sstream>
 
 #define MIN(x, y) ((x < y) ? (x) : (y))
 
@@ -8,13 +11,12 @@
 #define TEST
 #ifdef TEST
 	#include <cstdlib>
-	#define TEST_LEN_ARR (10)
-	#define N_TEST (1000000)
-	#define N_TEST_POINT MIN((10), TEST_LEN_ARR)
-	#define RANGE_VAL (1000000000) 
+	#define TEST_LEN_OP (10)	//10
+	#define N_TEST (1000000)	//1000000
+	#define N_TEST_POINT MIN((10), TEST_LEN_OP)
+	#define RANGE_VAL (100)	//1000000000
 	#define OFFSET_VAL (1)
 #endif
-
 
 class AVL
 {
@@ -56,34 +58,63 @@ public:
 		printf("n = %zu\n", n);
         size_t ind = 0;
         full_print_rq(root,ind);
-		printf("%d\n", 1);
+		printf("%d\n", n);
+	}
+	void full_print_stream(std::ostream &out)
+	{
+		out << n << '\n';
+        size_t ind = 0;
+        full_print_stream_rq(root, ind, out);
+		out << 1;
 	}
 
 private:
-	friend bool test(class AVL &avl, size_t length);
 	void full_print_rq(Node *cur, size_t &ind)
 	{
 		if(cur == nullptr) return;
-
-        ind++;
+		full_print_rq(cur->l, ind);
+		size_t ind_left = ind;
+		full_print_rq(cur->r, ind);
+		size_t ind_right = ind;
         
-        //printf("%-2zu - %2" DATA_SP " %2hhd -", ind, cur->x, cur->b);
-        printf("%" TREE_TYPE_SP, ind, cur->x);
+        ind++;
+
+        printf("%-2zu - %2" TREE_TYPE_SP " %2hhd -", ind, cur->x, cur->b);
 
         if(cur->l)
-        {
-            printf(" %d", ind + 1);
-        }
+            printf(" (%zu)", ind_left);
         else
-            printf(" -1");
+            printf(" (-1)");
+
         if(cur->r)
-            printf(" %d", ind + 1 + (cur->l != nullptr));
+            printf(" (%zu)", ind_right);
         else
-            printf(" -1");
+            printf(" (-1)");
         printf("\n");
 
-        full_print_rq(cur->l, ind);
-		full_print_rq(cur->r,ind);
+	}
+	void full_print_stream_rq(Node *cur, size_t &ind, std::ostream &out)
+	{
+		if(cur == nullptr) return;
+		full_print_stream_rq(cur->l, ind, out);
+		size_t ind_left = ind;
+		full_print_stream_rq(cur->r, ind, out);
+		size_t ind_right = ind;
+        
+        ind++;
+
+        out << cur->x;
+        out <<' ';
+        if(cur->l)
+            out << ind_left;
+        else
+            out << -1;
+        out << ' ';
+        if(cur->r)
+            out << ind_right;
+        else
+        	out << -1;
+        out << '\n';
 	}
 	/*static void swap(Node *a, Node *b)
 	{
@@ -248,7 +279,7 @@ private:
 		size_t n = 0;
 		Node *first = nullptr;
 
-		~List()
+		~AlmostTree()
 		{
 			Node *cur = first;
 			while(cur)
@@ -261,7 +292,7 @@ private:
 
 		void insert(T x)
 		{
-			Node *cur = start;
+			Node *cur = first;
 			while(cur)
 			{
 				if(cur->x == x) {return;}
@@ -272,12 +303,12 @@ private:
 					return;
 				}
 			}
-			start.next = new Node(x);
+			first->next = new Node(x);
 			n++;
 		}
 		void del(T x)
 		{
-			Node *cur = start;
+			Node *cur = first;
 			while(cur)
 			{
 				if(cur->next && cur->next->x) {
@@ -287,19 +318,19 @@ private:
 					return;
 				}
 			}
-			if(start.x == x)
+			if(first->x == x)
 			{
-				delete start;
+				delete first;
 				n--;
-				start = nullptr;
+				first = nullptr;
 			}
 		}
 		bool exists(T x)
 		{
-			Node *cur = start;
+			Node *cur = first;
 			while(cur)
 			{
-				if(cur.x == x)
+				if(cur->x == x)
 					return true;
 				cur = cur->next;
 			}
@@ -307,13 +338,13 @@ private:
 		}
 		bool next(T x, T *next)
 		{
-			Node *cur = start;
+			Node *cur = first;
 			T min = x;
 			while(cur)
 			{
 				if (cur->x > x)
 				{
-					min = cur->x
+					min = cur->x;
 					cur = cur->next;
 					break;
 				}
@@ -323,7 +354,7 @@ private:
 			while(cur)
 			{
 				if (cur->x > x && cur->x < min)
-					min = cur->x
+					min = cur->x;
 				cur = cur->next;
 			}
 			if(min == x) {return false;}
@@ -332,13 +363,13 @@ private:
 		}
 		bool prev(T x, T *prev)
 		{
-			Node *cur = start;
+			Node *cur = first;
 			T max = x;
 			while(cur)
 			{
 				if (cur->x < x)
 				{
-					max = cur->x
+					max = cur->x;
 					cur = cur->next;
 					break;
 				}
@@ -348,25 +379,100 @@ private:
 			while(cur)
 			{
 				if (cur->x < x && cur->x > max)
-					max = cur->x
+					max = cur->x;
 				cur = cur->next;
 			}
 			if(max == x) {return false;}
-			*next = max;
+			*prev = max;
 			return true;
 		}
 	};
 
-	bool test(class AVL &avl, size_t length)
+	class TestTree
 	{
-		AlmostTree tree(length);
-		for (size_t i = 0; i < avl.n; i++)
+	private:
+		#define IND_NEU_VAL (-2)
+		typedef unsigned int T;
+	public:
+		struct Node
 		{
-			if(avl.data[i].l > avl.data[i].r && (avl.data[i].l != -2 && avl.data[i].r != -2))
-				return false; 
-			tree.add({avl.data[i].x, avl.data[i].l, avl.data[i].r});
+			T x;
+			size_t l;
+			size_t r;
+		};
+	private:
+		size_t n;
+		size_t current_add = 0;
+		Node *data;
+
+	public:
+		TestTree(size_t n) : n(n), data(new Node[n]) {}
+		~TestTree() {delete[] data;}
+
+		void add(Node v)
+		{
+			if (current_add >= n) return;
+
+			data[current_add++] = v;
+			//printf("test tree add = %u %d %d\n", v.x, v.l, v.r);
 		}
-		return tree.check(0);
+
+		bool isTree(size_t root)
+		{
+			//printf("isTree = %zu\n", root);
+			return check_rq(root);
+		}
+		void print()
+		{
+			printf("Tree(");
+			for(size_t i = 0; i < n - 1; i++)
+				printf("%u, ", data[i].x);
+			printf("%u)\n", data[n-1].x);
+		}
+	private:
+		bool check_rq(size_t el)
+		{
+			//printf("check_rq_1 %d %d %d\n", el, data[el].l, data[el].r);
+			if(el == IND_NEU_VAL) return true;
+
+			if(data[el].l != IND_NEU_VAL && data[data[el].l].x >= data[el].x)
+				return false;
+
+			if(data[el].r != IND_NEU_VAL && data[data[el].r].x <= data[el].x)
+				return false;
+			
+			return check_rq(data[el].l) && check_rq(data[el].r);
+		}
+	};
+
+	bool test(class AVL &tree)
+	{
+		//printf("test_1\n");
+		std::stringstream tree_output;
+		tree.full_print_stream(tree_output);
+		//std::cout << "tree output = \"" << tree_output.str() << "\"\n";
+
+		size_t n;
+		tree_output >> n;
+		//printf("n = %zu\n", n);
+		TestTree test_tree(n);
+
+		//printf("test_2\n");
+		for (size_t i = 0; i < n; i++)
+		{
+			TREE_TYPE x;
+			size_t l, r;
+			tree_output >> x >> l >> r;
+			//printf("node = %u %d %d\n", x, l, r);
+			if((l != -1 && r != -1) && l > r)
+				return false; 
+			test_tree.add(TestTree::Node{x, --l, --r});
+		}
+		//printf("test_3\n");
+		size_t root;
+		tree_output >> root;
+		//printf("root = %zu\n", root);
+		return test_tree.isTree(--root);
 	}
 	bool full_test()
 	{
@@ -385,28 +491,52 @@ private:
 
 			Req(Type type, TREE_TYPE x) : type(type), x(x) {}
 		};
-		Req req_arr[TEST_LEN_ARR];
-		for (size_t length = 1; length <= TEST_LEN_ARR; length++)
+		Req *req_arr[TEST_LEN_OP];
+
+		for (size_t length = 1; length <= TEST_LEN_OP; length++)
 	    {
-	    	if((length-1) % (TEST_LEN_ARR/N_TEST_POINT) == 0)
-	    		printf("	len test %g%%\n", ((double)(length-1) / (double)TEST_LEN_ARR) * 100);
+	    	if((length-1) % (TEST_LEN_OP/N_TEST_POINT) == 0)
+	    		printf("	len test %g%%\n", ((double)(length-1) / (double)TEST_LEN_OP) * 100);
 
 	    	for(size_t n_attempt = 0; n_attempt < N_TEST; n_attempt++)
 	        {
 	        	AVL tree;
-	        	AlmostTree test;
+	        	//AlmostTree test;
 
 	        	for(size_t i = 0; i < length; i++)
-	        	{
-	        		data[i] = Req(rand % 5, (rand() % RANGE_VAL) + OFFSET_VAL);
-	        		switch(data[i].type)
+	        	{//Req::Type(rand() % 5)
+	        		req_arr[i] = new Req(Req::Type(0), (rand() % RANGE_VAL) + OFFSET_VAL);
+	        		switch(req_arr[i]->type)
 	        		{
-	        			case INSERT: {tree.insert(data[i].x); test.insert(data[i].x); break;}
-
-	        			case EXISTS: {};
-
+	        			case Req::Type::INSERT: {
+	        				tree.insert(req_arr[i]->x); 
+	        				//test.insert(req_arr[i].x); 
+	        				break;
+	        			}
+	        			//case Req::Type::EXISTS: {}
 	        		}
 	        	}
+	        	//printf("a\n");
+	        	if(!test(tree))
+		    	{
+		    		printf("Error with data:\n");
+		    		printf("%d\n", length);
+		    		for (size_t i = 0; i < length; i++)
+			    	{
+			    		printf("%u %u\n", req_arr[i]->type, req_arr[i]->x);
+			    		delete req_arr[i];
+			    	}
+			    	printf("\nAVL full print stream:\n");
+			    	tree.full_print_stream(std::cout);
+			    	printf("\nAVL full print:\n");
+			    	tree.full_print();
+			    	return false;
+		    	}
+		    	//printf("b\n");
+	    		for (size_t i = 0; i < length; i++)
+		    		delete req_arr[i];
+		    	//printf("c\n");
+
 				/*AVL avl(length);
 
 		    	for (size_t i = 0; i < length; i++)
@@ -474,7 +604,7 @@ int main()
 
     size_t n = 100;
 
-	AVL avl;
+	AVL tree;
 
 	for(char op[7]; scanf("%6s", op) != EOF && n--;)
 	{
@@ -485,7 +615,7 @@ int main()
 				printf("insert\n");
                 unsigned int x;
                 scanf("%u", &x);
-                avl.insert(x);
+                tree.insert(x);
 				break;
 			}
 			case delete_hash:
@@ -519,7 +649,15 @@ int main()
 		// unsigned int x;
 		// scanf("%u", &x);
 		// avl.add(x);
-		avl.full_print();
+
+	    //std::streambuf *buffer = std::cout.rdbuf();
+        //std::cout.rdbuf(std::cin.rdbuf());
+		
+
+		tree.full_print();
+
+        //std::cout.rdbuf(buffer);
+		
 	}
 	return 0;
 }
