@@ -1,8 +1,9 @@
 #include <cstdio>
 
-class AlmostTree
+class TestTree
 {
 private:
+	#define IND_NEU_VAL (-2)
 	typedef unsigned int T;
 public:
 	struct Node
@@ -13,12 +14,12 @@ public:
 	};
 private:
 	size_t n;
-	size_t current_add;
+	size_t current_add = 0;
 	Node *data;
 
 public:
-	AlmostTree(size_t n) : n(n), data(new Node[n]), current_add(0) {}
-	~AlmostTree() {delete[] data;}
+	TestTree(size_t n) : n(n), data(new Node[n]) {}
+	~TestTree() {delete[] data;}
 
 	void add(Node v)
 	{
@@ -27,7 +28,7 @@ public:
 		data[current_add++] = v;
 	}
 
-	bool check(size_t root)
+	bool isTree(size_t root)
 	{
 		return check_rq(root);
 	}
@@ -41,14 +42,14 @@ public:
 private:
 	bool check_rq(size_t el)
 	{
-		if(el == -2) return true;
+		if(el == IND_NEU_VAL) return true;
 
-		if(data[el].l != -2 && data[data[el].l].x >= data[el].x)
+		if(data[el].l != IND_NEU_VAL && data[data[el].l].x >= data[el].x)
 			return false;
 
-		if(data[el].r != -2 && data[data[el].r].x <= data[el].x)
+		if(data[el].r != IND_NEU_VAL && data[data[el].r].x <= data[el].x)
 			return false;
-
+		
 		return check_rq(data[el].l) && check_rq(data[el].r);
 	}
 };
@@ -58,7 +59,7 @@ int main()
 	size_t n;
     scanf("%zu\n", &n);
 
-    AlmostTree tree(n);
+    TestTree tree(n);
 
     for (size_t i = 0; i < n; i++)
     {
@@ -73,7 +74,7 @@ int main()
     size_t root;
     scanf("%zu", &root);
 
-    printf(tree.check(--root) ? "YES" : "NO");
+    printf(tree.isTree(--root) ? "YES" : "NO");
 
 	return 0;
 }
