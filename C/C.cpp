@@ -338,7 +338,7 @@ int main()
 		}
 		tree.full_print();	
 	}
-	return 32;
+	return 0;
 }
 
 
