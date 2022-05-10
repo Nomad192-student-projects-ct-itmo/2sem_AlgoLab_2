@@ -9,29 +9,25 @@ bool test(class AVL &tree)
 
 	size_t n;
 	tree_output >> n;
-	//printf("n = %zu\n", n);
 	TestTree test_tree(n);
 
-	//printf("test_2\n");
 	for (size_t i = 0; i < n; i++)
 	{
 		TREE_TYPE x;
 		size_t l, r;
 		tree_output >> x >> l >> r;
-		//printf("node = %u %d %d\n", x, l, r);
 		if((l != -1 && r != -1) && l >= r)
 			return false; 
 		test_tree.add(TestTree::Node{x, --l, --r});
 	}
-	//printf("test_3\n");
 	size_t root;
 	tree_output >> root;
-	//printf("root = %zu\n", root);
 	return test_tree.isTree(--root);
 }
 
 bool full_test()
 {
+	printf("len test, range: 1 - %u\n", TEST_LEN_OP);
 	struct Req
 	{
 		enum Type
@@ -57,26 +53,25 @@ bool full_test()
     	for(size_t n_attempt = 0; n_attempt < N_TEST; n_attempt++)
         {
         	AVL tree;
-        	//AlmostTree test;
+        	//AlmostTree test_tree;
 
         	for(size_t i = 0; i < length; i++)
-        	{//Req::Type(rand() % 5)
+        	{						//Req::Type(rand() % 5)
         		req_arr[i] = new Req(Req::Type(0), (rand() % RANGE_VAL) + OFFSET_VAL);
         		switch(req_arr[i]->type)
         		{
         			case Req::Type::INSERT: {
         				tree.insert(req_arr[i]->x); 
-        				//test.insert(req_arr[i].x); 
+        				//test_tree.insert(req_arr[i].x); 
         				break;
         			}
         			//case Req::Type::EXISTS: {}
         		}
         	}
-        	//printf("a\n");
         	if(!test(tree))
 	    	{
 	    		printf("Error with data:\n");
-	    		printf("%d\n", length);
+	    		printf("len op = %d\n", length);
 	    		for (size_t i = 0; i < length; i++)
 		    	{
 		    		printf("%u %u\n", req_arr[i]->type, req_arr[i]->x);
@@ -84,42 +79,13 @@ bool full_test()
 		    	}
 		    	printf("\nAVL full print stream:\n");
 		    	tree.full_print_stream(std::cout);
-		    	printf("\nAVL full print:\n");
+		    	printf("\n\nAVL full print:\n");
 		    	tree.full_print();
 		    	return false;
 	    	}
-	    	//printf("b\n");
+
     		for (size_t i = 0; i < length; i++)
 	    		delete req_arr[i];
-	    	//printf("c\n");
-
-			/*AVL avl(length);
-
-	    	for (size_t i = 0; i < length; i++)
-	    	{
-	    		data[i] = (rand() % RANGE_VAL) + OFFSET_VAL;
-	    		for (size_t y = 0; y < i; y++)
-	    		{
-	    			if(data[y] == data[i])
-	    			{
-	    				data[i] = (rand() % RANGE_VAL) + OFFSET_VAL;
-	    				y = -1;
-	    			}
-	    		}
-	    		avl.insert(data[i]);
-	    	}
-	    	if(!test(avl, length))
-	    	{
-	    		printf("Error with data:\n");
-	    		printf("%d\n", length);
-	    		for (size_t i = 0; i < length; i++)
-		    	{
-		    		printf("%u ", data[i]);
-		    	}
-		    	printf("\nBST full print:\n");
-		    	avl.full_print();
-		    	return false;
-	    	}*/
     	}
     }
     printf("	len test 100%% - OK\n");

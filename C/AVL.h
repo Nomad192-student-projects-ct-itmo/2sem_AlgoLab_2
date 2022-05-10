@@ -26,13 +26,25 @@ public:
 	~AVL() {delete root;}
 
 	void insert(T x);
+
+	void exists(T x);
 	void full_print();
 	void full_print_stream(std::ostream &out);
 
 private:
+	//Node *serch(T x);
+	Node *search_rq(Node *cur, T &x);
 	void full_print_rq(Node *cur, size_t &ind);
 	void full_print_stream_rq(Node *cur, size_t &ind, std::ostream &out);
-	void insert_rq(Node *el, T &x);
+	bool insert_rq(Node *cur, T &x);
+	void swap_val(Node *a, Node *b);
+	void swap_childs(Node *cur);
+	void balancing_node(Node *cur);
+	void small_left_rotation(Node *cur);
+	void large_left_rotation(Node *cur);
+	void small_right_rotation(Node *cur);
+	void large_right_rotation(Node *cur);
+	void balancing_tree(Node *cur);
 };
 
 #endif

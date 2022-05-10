@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <iostream>
 #include <sstream>
+#include <cmath>
 
 #define TEST
 #ifdef TEST
@@ -30,15 +31,37 @@
 		~AVL() {delete root;}
 
 		void insert(T x);
+
+		void exists(T x);
 		void full_print();
 		void full_print_stream(std::ostream &out);
 
 	private:
+		//Node *serch(T x);
+		Node *search_rq(Node *cur, T &x);
 		void full_print_rq(Node *cur, size_t &ind);
 		void full_print_stream_rq(Node *cur, size_t &ind, std::ostream &out);
-		void insert_rq(Node *el, T &x);
+		bool insert_rq(Node *cur, T &x);
+		void swap_val(Node *a, Node *b);
+		void swap_childs(Node *cur);
+		void balancing_node(Node *cur);
+		void small_left_rotation(Node *cur);
+		void large_left_rotation(Node *cur);
+		void small_right_rotation(Node *cur);
+		void large_right_rotation(Node *cur);
+		void balancing_tree(Node *cur);
 	};
 #endif
+
+AVL::Node *AVL::search_rq(Node *cur, T &x)
+{
+	if (x == cur->x) {return cur;}
+	Node *next;
+	if (x < cur->x) {if (!cur->l) {return cur;} else next = cur->l;}
+	if (x > cur->x) {if (!cur->r) {return cur;} else next = cur->r;}
+
+	return search_rq(next, x);
+}
 
 void AVL::insert(T x)
 {
@@ -49,13 +72,12 @@ void AVL::insert(T x)
 		return;
 	}
 	insert_rq(root, x);
-	//balancing();
 }
 void AVL::full_print()
 {
 	printf("n = %zu\n", n);
     size_t ind = 0;
-    full_print_rq(root,ind);
+    full_print_rq(root, ind);
 	printf("%d\n", n);
 }
 void AVL::full_print_stream(std::ostream &out)
@@ -63,7 +85,7 @@ void AVL::full_print_stream(std::ostream &out)
 	out << n << '\n';
     size_t ind = 0;
     full_print_stream_rq(root, ind, out);
-	out << 1;
+	out << n;
 }
 
 void AVL::full_print_rq(Node *cur, size_t &ind)
@@ -88,7 +110,6 @@ void AVL::full_print_rq(Node *cur, size_t &ind)
     else
         printf(" (-1)");
     printf("\n");
-
 }
 
 void AVL::full_print_stream_rq(Node *cur, size_t &ind, std::ostream &out)
@@ -102,157 +123,144 @@ void AVL::full_print_stream_rq(Node *cur, size_t &ind, std::ostream &out)
     ind++;
 
     out << cur->x;
-    out << ' ' << (cur->l ? ind_left 	: -1);
-    out << ' ' << (cur->r ? ind_right	: -1);
+    out << ' ' << (cur->l ? (int)ind_left 	: -1);
+    out << ' ' << (cur->r ? (int)ind_right	: -1);
     out << '\n';
 }
-/*static void swap(Node *a, Node *b)
+void AVL::swap_val(Node *a, Node *b)
 {
-	Node buf = *a;
-	*a = *b;
-	*b = buf;
-}
-static void swap_val(Node *a, Node *b)
-{
-	T x = a->x;
+	T buf = a->x;
 	a->x = b->x;
-	b->x = x;
+	b->x = buf;
 }
-void swap_lr(size_t el)
-{
-	size_t buf = data[el].r;
-	data[el].r = data[el].l;
-	data[el].l = buf;
-}
-void swap_childs(size_t el)
-{
-	if(data[el].l != IND_NEU_VAL && data[el].r != IND_NEU_VAL)
-		swap(data[el].r, data[el].l);
-	swap_lr(el);
-}
-void check_rl(size_t el)
-{
-	if(data[el].l == IND_NEU_VAL || data[el].r == IND_NEU_VAL)
-		return;
-	if(data[el].l > data[el]. r)
-		swap_childs(el);
-}
-void small_left_rotation()
-{
-	size_t x = 0;
-	size_t y = data[0].r;
-	swap(x, y);
-	x = y;
-	y = 0;
-	data[x].r = data[y].l;
-	check_rl(x);
-	data[y].l = x;
-	check_rl(y);
-}
-void large_left_rotation()
-{
-	size_t x = 0;
-	size_t y = data[0].r;
-	size_t z = data[data[0].r].l;
-	swap(x, z);
-	x = z;
-	z = 0;
-	data[x].r = data[z].l;
-	check_rl(x);
-	data[z].l = x;
-	data[y].l = data[z].r;
-	check_rl(y);
-	data[z].r = y;
-	check_rl(z);
-}
-void small_right_rotation()
-{
-	size_t x = 0;
-	size_t y = data[0].l;
-	swap(x, y);
-	x = y;
-	y = 0;
-	data[x].l = data[y].r;
-	check_rl(x);
-	data[y].r = x;
-	check_rl(y);
-}
-void large_right_rotation()
-{
-	size_t x = 0;
-	size_t y = data[0].l;
-	size_t z = data[data[0].l].r;
-	swap(x, z);
-	x = z;
-	z = 0;
-	data[x].l = data[z].r;
-	check_rl(x);
-	data[z].r = x;
-	data[y].r = data[z].l;
-	check_rl(y);
-	data[z].l = y;
-	check_rl(z);
-}
-void balancing()
-{
-	if(root->b == -2)
-	{
-		if(data[data[0].r].b == -1)
-		{
-			small_left_rotation();
-			return;
-		}
 
-		if(data[data[0].r].b == 1)
-		{
-			large_left_rotation();
-			return;
-		}
-	}
-	if(root.b == 2)
-	{
-		if(data[data[0].l].b == 1)
-		{
-			small_right_rotation();
-			return;
-		}
-
-		if(data[data[0].l].b == -1)
-		{
-			large_right_rotation();
-			return;
-		}
-	}
-}*/
-void AVL::insert_rq(Node *el, T &x)
+void AVL::swap_childs(Node *cur)
 {
-    Node *next;
-	if(x < el->x)
+	Node *buf = cur->r;
+	cur->r = cur->l;
+	cur->l = buf;
+}
+
+void AVL::balancing_node(Node* cur)
+{
+	cur->b = 0;
+  	if(cur->l) cur->b += (1 + abs(cur->l->b));
+    if(cur->r) cur->b -= (1 + abs(cur->r->b));
+}
+
+void AVL::small_left_rotation(Node *cur)
+{
+	Node *x = cur;
+	Node *y = x->r;
+
+	swap_val(x, y);
+	swap_childs(x);
+	swap_childs(y);
+
+	Node *buf = x->r;
+	x->r = y->l;
+	y->l = buf;
+
+	x->b = 0;
+	y->b = 0;
+}
+void AVL::large_left_rotation(Node *cur)
+{
+	Node *x = cur;
+	Node *y = x->r;
+	Node *z = y->l;
+
+	swap_val(x, z);
+	y->l = z->r;
+	z->r = x->l;
+	x->l = z;
+	swap_childs(z);
+
+	z->b = 0;
+	balancing_node(x);
+	balancing_node(y);
+}
+void AVL::small_right_rotation(Node *cur)
+{
+	Node *x = cur;
+	Node *y = x->l;
+
+	swap_val(x, y);
+	swap_childs(x);
+	swap_childs(y);
+
+	Node *buf = x->l;
+	x->l = y->r;
+	y->r = buf;
+
+	x->b = 0;
+	y->b = 0;
+}
+
+void AVL::large_right_rotation(Node *cur)
+{	
+	Node *x = cur;
+	Node *y = x->l;
+	Node *z = y->r;
+
+	swap_val(x, z);
+	y->r = z->l;
+	z->l = x->r;
+	x->r = z;
+	swap_childs(z);
+
+	z->b = 0;
+	balancing_node(x);
+	balancing_node(y);
+}
+void AVL::balancing_tree(Node *cur_root)
+{
+	if 		(cur_root->b == -2)
 	{
-        el->b++;
-        if(el->l == nullptr)
+		if 			(cur_root->r->b == -1)	small_left_rotation(cur_root);
+		else if 	(cur_root->r->b == 1)	large_left_rotation(cur_root);
+	}
+	else if (cur_root->b == 2)
+	{
+		if 			(cur_root->l->b == 1)	small_right_rotation(cur_root);
+		else if 	(cur_root->l->b == -1)	large_right_rotation(cur_root);
+	}
+}
+
+bool AVL::insert_rq(Node *cur, T &x)
+{
+	Node *next;
+	if(x < cur->x)
+	{
+        if(cur->l == nullptr)
         {
-            el->l = new Node{x};
+            cur->l = new Node{x};
+            cur->b++;
             n++;
-            return;
+			return true;
         }
-        next = el->l;
+        next = cur->l;
 	}
-	else if(x > el->x)
+	else if(x > cur->x)
 	{
-        el->b--;
-        if(el->r == nullptr)
+        if(cur->r == nullptr)
         {
-            el->r = new Node{x};
+            cur->r = new Node{x};
+            cur->b--;
             n++;
-            return;
+            return true;
         }
-        next = el->r;
-	} else return;  ///x == el.x
+        next = cur->r;
+	} else return false;  ///x == cur->x
 
-    insert_rq(next, x);
+    if(insert_rq(next, x))
+    {
+    	balancing_node(cur);
+    	balancing_tree(cur);
+    	return true;
+    }
+    return false;  ///x there is in the tree
 }
-
 
 /*static bool eq_str(const char a[], const char b[])
 {
@@ -332,24 +340,16 @@ int main()
 				return -1;
 			}
 		}
-		// unsigned int x;
-		// scanf("%u", &x);
-		// avl.add(x);
-
-	    //std::streambuf *buffer = std::cout.rdbuf();
-        //std::cout.rdbuf(std::cin.rdbuf());
-		
-
-		tree.full_print();
-
-        //std::cout.rdbuf(buffer);
-		
+		tree.full_print();	
 	}
 	return 0;
 }
 
 
 /* 
+ * quick start
+cd 2sem_AlgoLab_2\C\build && ..\..\run_cmake\run
+
  * set 
 mkdir build & cd build & cmake -G "MinGW Makefiles" ..
 
