@@ -3,7 +3,7 @@
 #include <sstream>
 #include <cmath>
 
-#define TEST
+//#define TEST
 #ifdef TEST
 	#include "C_Test.h"
 #else
@@ -287,11 +287,7 @@ constexpr hash_type next_hash   =  hash_str("next");
 constexpr hash_type prev_hash   =  hash_str("prev");
 
 int main()
-{
-	#ifdef int 
-	printf("f");
-	#endif
-	
+{	
 #ifdef TEST
 	return !full_test();
 #endif
@@ -342,13 +338,14 @@ int main()
 		}
 		tree.full_print();	
 	}
-	return 0;
+	return 32;
 }
 
 
 /* 
  * quick start
-cd 2sem_AlgoLab_2\C\build && ..\..\run_cmake\run
+cd 2sem_AlgoLab_2\C\build
+..\..\run_cmake\run
 
  * set 
 mkdir build & cd build & cmake -G "MinGW Makefiles" ..
