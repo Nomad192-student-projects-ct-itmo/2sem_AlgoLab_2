@@ -9,6 +9,7 @@ private:
 	struct Node
 	{
 		T x;
+		size_t deep = 1;
 		signed char b = 0;
 		Node *l = nullptr;
 		Node *r = nullptr;

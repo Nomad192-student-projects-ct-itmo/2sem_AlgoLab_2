@@ -1,9 +1,10 @@
 #include <cstdio>
 #include <iostream>
 #include <sstream>
-#include <cmath>
 
-//#define TEST
+#define MAX(x, y) ((x > y) ? (x) : (y))
+
+#define TEST
 #ifdef TEST
 	#include "C_Test.h"
 #else
@@ -15,6 +16,7 @@
 		{
 			T x;
 			signed char b = 0;
+			size_t deep = 1;
 			Node *l = nullptr;
 			Node *r = nullptr;
 
@@ -98,15 +100,15 @@ void AVL::full_print_rq(Node *cur, size_t &ind)
     
     ind++;
 
-    printf("%-2zu - %2" TREE_TYPE_SP " %2hhd -", ind, cur->x, cur->b);
+    printf("%-2zu - x=%-2" TREE_TYPE_SP " h=%-2zu b=%-2hhd -", ind, cur->x, cur->deep, cur->b);
 
     if(cur->l)
-        printf(" (%zu)", ind_left);
+        printf(" (%2zu)", ind_left);
     else
         printf(" (-1)");
 
     if(cur->r)
-        printf(" (%zu)", ind_right);
+        printf(" (%2zu)", ind_right);
     else
         printf(" (-1)");
     printf("\n");
@@ -143,9 +145,12 @@ void AVL::swap_childs(Node *cur)
 
 void AVL::balancing_node(Node* cur)
 {
-	cur->b = 0;
-  	if(cur->l) cur->b += (1 + abs(cur->l->b));
-    if(cur->r) cur->b -= (1 + abs(cur->r->b));
+	size_t deep_l = 0, deep_r = 0;
+	if(cur->l) deep_l = cur->l->deep;
+	if(cur->r) deep_r = cur->r->deep;	
+
+	cur->deep = MAX(deep_l, deep_r) + 1;
+	cur->b = deep_l - deep_r;
 }
 
 void AVL::small_left_rotation(Node *cur)
@@ -161,8 +166,8 @@ void AVL::small_left_rotation(Node *cur)
 	x->r = y->l;
 	y->l = buf;
 
-	x->b = 0;
-	y->b = 0;
+	balancing_node(y);
+	balancing_node(x);
 }
 void AVL::large_left_rotation(Node *cur)
 {
@@ -176,9 +181,9 @@ void AVL::large_left_rotation(Node *cur)
 	x->l = z;
 	swap_childs(z);
 
-	z->b = 0;
-	balancing_node(x);
+	balancing_node(z);
 	balancing_node(y);
+	balancing_node(x);
 }
 void AVL::small_right_rotation(Node *cur)
 {
@@ -193,8 +198,8 @@ void AVL::small_right_rotation(Node *cur)
 	x->l = y->r;
 	y->r = buf;
 
-	x->b = 0;
-	y->b = 0;
+	balancing_node(y);
+	balancing_node(x);
 }
 
 void AVL::large_right_rotation(Node *cur)
@@ -209,22 +214,25 @@ void AVL::large_right_rotation(Node *cur)
 	x->r = z;
 	swap_childs(z);
 
-	z->b = 0;
-	balancing_node(x);
+	balancing_node(z);
 	balancing_node(y);
+	balancing_node(x);
 }
 void AVL::balancing_tree(Node *cur_root)
 {
-	if 		(cur_root->b == -2)
+	if (cur_root->b == -2)
 	{
-		if 			(cur_root->r->b == -1)	small_left_rotation(cur_root);
-		else if 	(cur_root->r->b == 1)	large_left_rotation(cur_root);
+		if 		(cur_root->r->b == -1 || cur_root->r->b == 0)	small_left_rotation(cur_root);
+		else if (cur_root->r->b == 1)							large_left_rotation(cur_root);
+		else {printf("Error, b = -2, b right = %d\n", cur_root->r->b);}
 	}
 	else if (cur_root->b == 2)
 	{
-		if 			(cur_root->l->b == 1)	small_right_rotation(cur_root);
-		else if 	(cur_root->l->b == -1)	large_right_rotation(cur_root);
+		if 		(cur_root->l->b == 1 || cur_root->l->b == 0)	small_right_rotation(cur_root);
+		else if (cur_root->l->b == -1)							large_right_rotation(cur_root);
+		else {printf("Error, b = 2, b left = %d\n", cur_root->l->b);}
 	}
+	else if (cur_root->b > 2 || cur_root->b < -2) {printf("Error, b = %d\n", cur_root->b);}
 }
 
 bool AVL::insert_rq(Node *cur, T &x)
@@ -235,7 +243,7 @@ bool AVL::insert_rq(Node *cur, T &x)
         if(cur->l == nullptr)
         {
             cur->l = new Node{x};
-            cur->b++;
+			balancing_node(cur);          
             n++;
 			return true;
         }
@@ -246,7 +254,7 @@ bool AVL::insert_rq(Node *cur, T &x)
         if(cur->r == nullptr)
         {
             cur->r = new Node{x};
-            cur->b--;
+            balancing_node(cur);
             n++;
             return true;
         }
@@ -289,6 +297,16 @@ constexpr hash_type prev_hash   =  hash_str("prev");
 int main()
 {	
 #ifdef TEST
+	
+	/*size_t cache[2];
+	cache[0] = 0;
+	cache[1] = 1;
+
+	for (size_t i = 2; i <= 10; i++) {
+	    cache[i%2] = cache[0] + cache[1] + 1;
+	    printf("deep = %zu, n=%zu\n", i, cache[i%2]);
+	}*/
+
 	return !full_test();
 #endif
 

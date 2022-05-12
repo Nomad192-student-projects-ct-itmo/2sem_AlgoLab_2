@@ -27,7 +27,7 @@ bool test(class AVL &tree)
 
 bool full_test()
 {
-	printf("len test, range: 1 - %u\n", TEST_LEN_OP);
+	printf("len test, range: 1 - %u, n tests = %d\n", TEST_LEN_OP, N_TEST);
 	struct Req
 	{
 		enum Type
