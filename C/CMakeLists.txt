@@ -4,8 +4,8 @@ project(C)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_compile_definitions(TREE_TYPE=unsigned\ int)
-add_compile_definitions(TREE_TYPE_SP="u")
+add_compile_definitions(TREE_TYPE=int) #unsigned\ int
+add_compile_definitions(TREE_TYPE_SP="d")
 
 add_library(AlmostTree STATIC AlmostTree.h AlmostTree.cpp)
 add_library(TestTree STATIC TestTree.h TestTree.cpp)

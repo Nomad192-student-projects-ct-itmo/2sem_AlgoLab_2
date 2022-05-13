@@ -12,7 +12,7 @@ size_t TestTree::calc_max_deep(size_t n) const noexcept
 	    cache[i%2] = cache[0] + cache[1] + 1;
 	}
 
-	return deep - 1;//(double)deep;
+	return deep - 1;
 }
 
 void TestTree::add(Node v) noexcept
@@ -25,7 +25,6 @@ void TestTree::add(Node v) noexcept
 bool TestTree::isTree(size_t root) const noexcept
 {
 	if(n == 0) return true;
-	//printf("n=%zu, max deep=%zu\n", n, max_deep);
 	return isTree_rq(root, 1);
 }
 

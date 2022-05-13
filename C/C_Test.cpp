@@ -143,10 +143,11 @@ bool full_test()
 	printf("len test, range: 1 - %u, n tests = %d\n", TEST_LEN_OP, N_TEST);
 	Req *req_arr = new Req[TEST_LEN_OP];
 
+	printf("\tlen test [       ");
 	for (size_t length = 1; length <= TEST_LEN_OP; length++)
     {
     	if((length-1) % (TEST_LEN_OP/N_TEST_POINT) == 0)
-    		printf("\r\tlen test %g%%", ((double)(length-1) / (double)TEST_LEN_OP) * 100);
+    		printf("\b\b\b\b\b\b\b%4.1f%%]", ((double)(length-1) / (double)TEST_LEN_OP) * 100);
 
     	for(size_t n_attempt = 0; n_attempt < N_TEST; n_attempt++)
         {
@@ -154,7 +155,7 @@ bool full_test()
         	AlmostTree test_tree;
 
         	for(size_t i = 0; i < length; i++)
-        	{						//Req::Type(rand() % 5)
+        	{
         		req_arr[i] = Req(Req::Type(rand() % 5), (rand() % RANGE_VAL) + OFFSET_VAL);
         		switch(req_arr[i].type)
         		{

@@ -25,6 +25,7 @@ private:
 	};
 	size_t n = 0;
 	Node *root = nullptr;
+	
 public:
 	~AVL() {delete root;}
 
@@ -38,15 +39,10 @@ public:
 	void full_print_stream(std::ostream &out);
 
 private:
-	//Node *serch(T x);
 	Node *search_rq(Node *cur, T &x);
-	//void del_leaf(Node *cur, Node *parent);
-	//T del_right_rq(Node *cur);
-	//T del_left_rq(Node *cur);
 	void del_node(Node *cur);
 	bool next_rq(Node *cur, T x, T *res);
 	bool prev_rq(Node *cur, T x, T *res);
-	//bool del_rq(Node *cur, T x);
 
 	void full_print_rq(Node *cur, size_t &ind);
 	void full_print_stream_rq(Node *cur, size_t &ind, std::ostream &out);
