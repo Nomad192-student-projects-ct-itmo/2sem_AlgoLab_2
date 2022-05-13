@@ -26,7 +26,7 @@ private:
 public:
 	~AVL() {delete root;}
 
-	void insert(T x);
+	bool insert(T x);
 
 	void exists(T x);
 	void full_print();

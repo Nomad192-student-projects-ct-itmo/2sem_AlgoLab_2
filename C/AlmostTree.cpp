@@ -11,21 +11,25 @@ AlmostTree::~AlmostTree() noexcept
 	}
 }
 
-void AlmostTree::insert(const T x) noexcept
+bool AlmostTree::insert(const T x) noexcept
 {
-	Node *cur = first;
-	while(cur)
+	if(!first)
 	{
-		if(cur->x == x) {return;}
-		if(cur->next != nullptr)
-		{
-			cur->next = new Node(x);
-			n++;
-			return;
-		}
+		first = new Node(x);
+		n++;
+		return true;
 	}
-	first->next = new Node(x);
+
+	Node *cur = first;
+	while(cur->next)
+	{
+		if(cur->x == x) {return false;}
+		cur = cur->next;
+	}
+	if(cur->x == x) {return false;}
+	cur->next = new Node(x);
 	n++;
+	return true;
 }
 
 void AlmostTree::del(const T x) noexcept

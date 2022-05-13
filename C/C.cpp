@@ -32,7 +32,7 @@
 	public:
 		~AVL() {delete root;}
 
-		void insert(T x);
+		bool insert(T x);
 
 		void exists(T x);
 		void full_print();
@@ -65,15 +65,15 @@ AVL::Node *AVL::search_rq(Node *cur, T &x)
 	return search_rq(next, x);
 }
 
-void AVL::insert(T x)
+bool AVL::insert(T x)
 {
 	if(root == nullptr)
 	{
 		root = new Node{x};
         n++;
-		return;
+		return true;
 	}
-	insert_rq(root, x);
+	return insert_rq(root, x);
 }
 void AVL::full_print()
 {
@@ -306,7 +306,6 @@ int main()
 	    cache[i%2] = cache[0] + cache[1] + 1;
 	    printf("deep = %zu, n=%zu\n", i, cache[i%2]);
 	}*/
-
 	return !full_test();
 #endif
 

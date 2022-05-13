@@ -25,25 +25,41 @@ bool test(class AVL &tree)
 	return test_tree.isTree(--root);
 }
 
+struct Req
+{
+	enum Type
+	{
+		INSERT,
+		DELETE,
+		EXISTS,
+		NEXT,
+		PREV,  
+	};
+	Type type;
+	TREE_TYPE x;
+
+	Req() : type(INSERT), x(0) {}
+	Req(Type type, TREE_TYPE x) : type(type), x(x) {}
+};
+
+static void print_error(const char *error_str, size_t length, Req *req_arr, AVL *tree)
+{
+	printf("Error %s with data:\n", error_str);
+	printf("len op = %d\n", length);
+	for (size_t i = 0; i < length; i++)
+	{
+		printf("%u %u\n", req_arr[i].type, req_arr[i].x);
+	}
+	printf("\nAVL full print stream:\n");
+	tree->full_print_stream(std::cout);
+	printf("\n\nAVL full print:\n");
+	tree->full_print();
+}
+
 bool full_test()
 {
 	printf("len test, range: 1 - %u, n tests = %d\n", TEST_LEN_OP, N_TEST);
-	struct Req
-	{
-		enum Type
-		{
-			INSERT,
-			DELETE,
-			EXISTS,
-			NEXT,
-			PREV,  
-		};
-		Type type;
-		TREE_TYPE x;
-
-		Req(Type type, TREE_TYPE x) : type(type), x(x) {}
-	};
-	Req *req_arr[TEST_LEN_OP];
+	Req *req_arr = new Req[TEST_LEN_OP];
 
 	for (size_t length = 1; length <= TEST_LEN_OP; length++)
     {
@@ -53,16 +69,23 @@ bool full_test()
     	for(size_t n_attempt = 0; n_attempt < N_TEST; n_attempt++)
         {
         	AVL tree;
-        	//AlmostTree test_tree;
+        	AlmostTree test_tree;
 
         	for(size_t i = 0; i < length; i++)
         	{						//Req::Type(rand() % 5)
-        		req_arr[i] = new Req(Req::Type(0), (rand() % RANGE_VAL) + OFFSET_VAL);
-        		switch(req_arr[i]->type)
+        		req_arr[i] = Req(Req::Type(0), (rand() % RANGE_VAL) + OFFSET_VAL);
+        		switch(req_arr[i].type)
         		{
-        			case Req::Type::INSERT: {
-        				tree.insert(req_arr[i]->x); 
-        				//test_tree.insert(req_arr[i].x); 
+        			case Req::Type::INSERT: 
+        			{
+        				bool res 		= tree.insert		(req_arr[i].x); 
+        				bool res_test 	= test_tree.insert	(req_arr[i].x); 
+        				if(res != res_test)
+        				{
+							print_error("insert", length, req_arr, &tree);
+							delete[] req_arr;
+							return false;
+        				}
         				break;
         			}
         			//case Req::Type::EXISTS: {}
@@ -70,24 +93,13 @@ bool full_test()
         	}
         	if(!test(tree))
 	    	{
-	    		printf("Error with data:\n");
-	    		printf("len op = %d\n", length);
-	    		for (size_t i = 0; i < length; i++)
-		    	{
-		    		printf("%u %u\n", req_arr[i]->type, req_arr[i]->x);
-		    		delete req_arr[i];
-		    	}
-		    	printf("\nAVL full print stream:\n");
-		    	tree.full_print_stream(std::cout);
-		    	printf("\n\nAVL full print:\n");
-		    	tree.full_print();
-		    	return false;
+				print_error("tree", length, req_arr, &tree);
+				delete[] req_arr;
+				return false;
 	    	}
-
-    		for (size_t i = 0; i < length; i++)
-	    		delete req_arr[i];
     	}
     }
+    delete[] req_arr;
     printf("	len test 100%% - OK\n");
     return true;
 }
