@@ -24,6 +24,7 @@ void TestTree::add(Node v) noexcept
 
 bool TestTree::isTree(size_t root) const noexcept
 {
+	if(n == 0) return true;
 	//printf("n=%zu, max deep=%zu\n", n, max_deep);
 	return isTree_rq(root, 1);
 }

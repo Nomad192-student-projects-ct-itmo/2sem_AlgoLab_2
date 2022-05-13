@@ -32,24 +32,30 @@ bool AlmostTree::insert(const T x) noexcept
 	return true;
 }
 
-void AlmostTree::del(const T x) noexcept
+bool AlmostTree::del(const T x) noexcept
 {
-	Node *cur = first;
-	while(cur)
+	if(!first) return false;
+	if(first->x == x) 
 	{
-		if(cur->next && cur->next->x) {
-			cur->next = cur->next->next;
-			delete cur->next;
-			n--;
-			return;
-		}
-	}
-	if(first->x == x)
-	{
+		Node *new_next = first->next;
 		delete first;
+		first = new_next;
 		n--;
-		first = nullptr;
+		return true;
 	}
+	Node *cur = first;
+	while(cur->next)
+	{
+		if(cur->next && cur->next->x == x) {
+			Node *new_next =  cur->next->next;
+			delete cur->next;
+			cur->next = new_next;
+			n--;
+			return true;
+		}
+		cur = cur->next;
+	}
+	return false;
 }
 bool AlmostTree::exists(const T x) const noexcept
 {
