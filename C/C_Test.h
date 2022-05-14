@@ -9,10 +9,11 @@
 
 #define MIN(x, y) ((x < y) ? (x) : (y))
 #define MAX(x, y) ((x > y) ? (x) : (y))
+#define MUL(x, y) (x * y)
 
-#define TEST_LEN_OP 	(2000)	//10
-#define N_TEST 			(100)	//1000000
-#define N_TEST_POINT 	MIN((1000), 	TEST_LEN_OP)
+#define TEST_LEN_OP 	(100)	//10
+#define N_TEST 			(10000)	//1000000
+#define N_TEST_POINT 	MIN((1000), 	MUL(TEST_LEN_OP, N_TEST))
 #define RANGE_VAL 		MAX((2000000000), 	TEST_LEN_OP)	//1000000000
 #define OFFSET_VAL 		(-1000000000)
 

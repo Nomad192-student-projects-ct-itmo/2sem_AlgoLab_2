@@ -1,6 +1,7 @@
 #include "AlmostTree.h"
 #include "TestTree.h"
 #include "C_Test.h"
+#include <ctime>
 
 bool test(class AVL &tree)
 {
@@ -142,20 +143,28 @@ bool full_test()
 {
 	printf("len test, range: 1 - %u, n tests = %d\n", TEST_LEN_OP, N_TEST);
 	Req *req_arr = new Req[TEST_LEN_OP];
-
-	printf("\tlen test [       ");
+	int start = clock();
+	int all = start;
+	printf("\tlen test [   0%]");
 	for (size_t length = 1; length <= TEST_LEN_OP; length++)
     {
-    	if((length-1) % (TEST_LEN_OP/N_TEST_POINT) == 0)
-    		printf("\b\b\b\b\b\b\b%4.1f%%]", ((double)(length-1) / (double)TEST_LEN_OP) * 100);
 
     	for(size_t n_attempt = 0; n_attempt < N_TEST; n_attempt++)
         {
+        	int end = clock();
+	    	if(((length-1)*N_TEST + n_attempt) % (TEST_LEN_OP*N_TEST/N_TEST_POINT) == 0 && end - start >= 400)
+	    	{
+	    		start = clock();
+	    		printf("\b\b\b\b\b\b%4.1f%%]", ((double)(length-1)*(N_TEST) + n_attempt) / ((double)TEST_LEN_OP*(N_TEST)) * 100);
+	    	}
+
         	AVL tree;
         	AlmostTree test_tree;
 
         	for(size_t i = 0; i < length; i++)
         	{
+
+        		
         		req_arr[i] = Req(Req::Type(rand() % 5), (rand() % RANGE_VAL) + OFFSET_VAL);
         		switch(req_arr[i].type)
         		{
@@ -253,6 +262,11 @@ bool full_test()
     	}
     }
     delete[] req_arr;
-    printf("\r\tlen test 100%% - OK\n");
+    //printf("\r\tlen test 100%% - OK\n");
+    printf("\b\b\b\b\b\b100%%] - OK\n");
+    float t = clock();
+    t -= all;
+    t /= 1000;
+    printf("Time: %gs\n", t);
     return true;
 }
