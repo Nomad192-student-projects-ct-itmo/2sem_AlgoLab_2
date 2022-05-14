@@ -9,6 +9,7 @@
 !*.c
 !*.h
 !*.cpp
+!*.hpp
 !*.md
 !CMakeLists.txt
 !*.git*
