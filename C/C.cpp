@@ -7,7 +7,7 @@
 #define TREE_TYPE int
 #define TREE_TYPE_SP "d"
 
-#define TEST
+//#define TEST
 #ifdef TEST
 	#include "C_Test.h"
 #else
