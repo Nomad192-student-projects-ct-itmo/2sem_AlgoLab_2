@@ -1,4 +1,4 @@
-#include "TestTree.h"
+#include "TestTree.hpp"
 
 size_t TestTree::calc_max_deep(size_t n) const noexcept
 {

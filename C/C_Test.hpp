@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include "AVL.h"
+#include "AVL.hpp"
 
 #define MIN(x, y) ((x < y) ? (x) : (y))
 #define MAX(x, y) ((x > y) ? (x) : (y))

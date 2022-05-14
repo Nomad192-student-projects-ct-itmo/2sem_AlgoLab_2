@@ -9,7 +9,7 @@
 
 //#define TEST
 #ifdef TEST
-	#include "C_Test.h"
+	#include "C_Test.hpp"
 #else
 	class AVL
 	{

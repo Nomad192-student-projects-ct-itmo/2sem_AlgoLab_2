@@ -7,9 +7,9 @@ set(CMAKE_CXX_STANDARD 14)
 add_compile_definitions(TREE_TYPE=int) #unsigned\ int
 add_compile_definitions(TREE_TYPE_SP="d")
 
-add_library(AlmostTree STATIC AlmostTree.h AlmostTree.cpp)
-add_library(TestTree STATIC TestTree.h TestTree.cpp)
-add_library(C_Test STATIC C_Test.h C_Test.cpp)
+add_library(AlmostTree STATIC AlmostTree.hpp AlmostTree.cpp)
+add_library(TestTree STATIC TestTree.hpp TestTree.cpp)
+add_library(C_Test STATIC AVL.hpp C_Test.hpp C_Test.cpp)
 
 target_link_libraries(C_Test TestTree)
 target_link_libraries(C_Test AlmostTree)
