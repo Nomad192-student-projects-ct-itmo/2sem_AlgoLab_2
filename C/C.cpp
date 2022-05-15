@@ -7,7 +7,7 @@
 #define TREE_TYPE int
 #define TREE_TYPE_SP "d"
 
-#define TEST
+//#define TEST
 #ifdef TEST
 	#include "C_Test.hpp"
 #else
@@ -24,9 +24,9 @@
 			Node *l = nullptr;
 			Node *r = nullptr;
 
-			Node(const T &x) noexcept : x(x), p(nullptr) {}
-			Node(const T &x, Node *p) noexcept : x(x), p(p) {}
-			~Node() noexcept
+			Node(T &x) : x(x), p(nullptr) {}
+			Node(T &x, Node *p) : x(x), p(p) {}
+			~Node()
 			{
 				delete l;
 				delete r;
@@ -36,40 +36,107 @@
 		Node *root = nullptr;
 
 	public:
-		~AVL() noexcept {delete root;} 
+		~AVL() {delete root;}
 
-		bool insert 	(const T x) noexcept;
-		bool del 		(const T x) noexcept;
-		bool exists 	(const T x) 		const noexcept;
-		bool next 		(const T x, T *res) const noexcept;
-		bool prev 		(const T x, T *res) const noexcept;
+		bool insert(T x);
+		bool del(T x);
+		bool exists(T x);
+		bool next(T x, T *res);
+		bool prev(T x, T *res);
 
-		void full_print() const noexcept;
-		void full_print_stream(std::ostream &out) const noexcept;
+		void full_print();
+		void full_print_stream(std::ostream &out);
 
 	private:
-		bool insert_rq(Node *cur, const T &x) noexcept;
-		void del_node(Node *cur) noexcept;
-		Node *search_rq(Node *cur, const T &x) const noexcept;
-		bool next_rq(Node *cur, const T x, T *res) const noexcept;
-		bool prev_rq(Node *cur, const T x, T *res) const noexcept;
+		Node *search_rq(Node *cur, T &x);
+		void del_node(Node *cur);
+		bool next_rq(Node *cur, T x, T *res);
+		bool prev_rq(Node *cur, T x, T *res);
 
-		void full_print_rq(const Node *cur, size_t &ind) const noexcept;
-		void full_print_stream_rq(const Node *cur, size_t &ind, std::ostream &out) const noexcept;
-		
-		void swap_val(Node *a, Node *b) noexcept;
-		void swap_childs(Node *cur) noexcept;
-		void restore_parent(Node *cur) noexcept;
-		void balancing_node(Node *cur) noexcept;
-		void small_left_rotation(Node *cur) noexcept;
-		void large_left_rotation(Node *cur) noexcept;
-		void small_right_rotation(Node *cur) noexcept;
-		void large_right_rotation(Node *cur) noexcept;
-		void balancing_tree(Node *cur) noexcept;
+		void full_print_rq(Node *cur, size_t &ind);
+		void full_print_stream_rq(Node *cur, size_t &ind, std::ostream &out);
+		bool insert_rq(Node *cur, T &x);
+		void swap_val(Node *a, Node *b);
+		void swap_childs(Node *cur);
+		void restore_parent(Node *cur);
+		void balancing_node(Node *cur);
+		void small_left_rotation(Node *cur);
+		void large_left_rotation(Node *cur);
+		void small_right_rotation(Node *cur);
+		void large_right_rotation(Node *cur);
+		void balancing_tree(Node *cur);
 	};
 #endif
 
-bool AVL::insert(const T x) noexcept
+AVL::Node *AVL::search_rq(Node *cur, T &x)
+{
+	if (x == cur->x) {return cur;}
+	Node *next;
+	if 		(x < cur->x) {if (!cur->l) {return cur;} else next = cur->l;}
+	else if (x > cur->x) {if (!cur->r) {return cur;} else next = cur->r;}
+
+	return search_rq(next, x);
+}
+
+bool AVL::exists(T x)
+{
+	if(!root) return false;
+	Node *cur = search_rq(root, x);
+	if(cur->x == x) return true;
+	return false;
+}
+
+bool AVL::next(T x, T *res)
+{
+	if(!root) return false;
+
+	return next_rq(root, x, res);
+}
+bool AVL::next_rq(Node *cur, T x, T *res)
+{
+	if (x == cur->x) 
+	{
+		if(!cur->r) return false;
+		cur = cur->r;
+		if(!cur->l) {*res = cur->x; return true;} 
+		while(cur->l) cur = cur->l;
+		*res = cur->x;
+		return true;
+	}
+	Node *next;
+	if 		(x < cur->x) {*res = cur->x; if (!cur->l) {return true; } else {next_rq(cur->l, x, res); return true;} }
+	else if (x > cur->x) {if (!cur->r) {return false; } else next = cur->r;}
+
+	return next_rq(next, x, res);
+}
+
+
+bool AVL::prev(T x, T *res)
+{
+	if(!root) return false;
+
+	return prev_rq(root, x, res);
+}
+bool AVL::prev_rq(Node *cur, T x, T *res)
+{
+	if (x == cur->x) 
+	{
+		if(!cur->l) return false;
+		cur = cur->l;
+		if(!cur->r) {*res = cur->x; return true;} 
+		while(cur->r) cur = cur->r;
+		*res = cur->x;
+		return true;
+	}
+	Node *next;
+	if 		(x < cur->x) {if (!cur->l) {return false; } else next = cur->l;}
+	else if (x > cur->x) {*res = cur->x; if (!cur->r) {return true; } else {prev_rq(cur->r, x, res); return true;} }
+
+	return prev_rq(next, x, res);
+}
+
+
+bool AVL::insert(T x)
 {
 	if(root == nullptr)
 	{
@@ -80,7 +147,7 @@ bool AVL::insert(const T x) noexcept
 	bool result = insert_rq(root, x);
 	return result;
 }
-bool AVL::insert_rq(Node *cur, const T &x) noexcept
+bool AVL::insert_rq(Node *cur, T &x)
 {
 	Node *next;
 	if(x < cur->x)
@@ -115,30 +182,8 @@ bool AVL::insert_rq(Node *cur, const T &x) noexcept
     return false;  ///x there is in the tree
 }
 
-bool AVL::del(const T x) noexcept
-{
-	if(!root) return false;
 
-	if(root->x == x)
-	{
-		if(!root->l && !root->r)
-		{
-			n--;
-			delete root;
-			root = nullptr;
-			return true;
-		}
-		del_node(root);
-		return true;
-	}
-
-	Node *cur = search_rq(root, x);
-	if(cur->x != x)
-		return false;
-	del_node(cur);
-	return true;
-}
-void AVL::del_node(Node *cur) noexcept
+void AVL::del_node(Node *cur)
 {
 	n--;
 	if(!cur->l && !cur->r)
@@ -192,82 +237,38 @@ void AVL::del_node(Node *cur) noexcept
 
 }
 
-
-AVL::Node *AVL::search_rq(Node *cur, const T &x) const noexcept
-{
-	if (x == cur->x) {return cur;}
-	Node *next;
-	if 		(x < cur->x) {if (!cur->l) {return cur;} else next = cur->l;}
-	else if (x > cur->x) {if (!cur->r) {return cur;} else next = cur->r;}
-
-	return search_rq(next, x);
-}
-
-bool AVL::exists(const T x) const noexcept
+bool AVL::del(T x)
 {
 	if(!root) return false;
+
+	if(root->x == x)
+	{
+		if(!root->l && !root->r)
+		{
+			n--;
+			delete root;
+			root = nullptr;
+			return true;
+		}
+		del_node(root);
+		return true;
+	}
+
 	Node *cur = search_rq(root, x);
-	if(cur->x == x) return true;
-	return false;
+	if(cur->x != x)
+		return false;
+	del_node(cur);
+	return true;
 }
 
-bool AVL::next(const T x, T *res) const noexcept
-{
-	if(!root) return false;
-
-	return next_rq(root, x, res);
-}
-bool AVL::next_rq(Node *cur, const T x, T *res) const noexcept
-{
-	if (x == cur->x) 
-	{
-		if(!cur->r) return false;
-		cur = cur->r;
-		if(!cur->l) {*res = cur->x; return true;} 
-		while(cur->l) cur = cur->l;
-		*res = cur->x;
-		return true;
-	}
-	Node *next;
-	if 		(x < cur->x) {*res = cur->x; if (!cur->l) {return true; } else {next_rq(cur->l, x, res); return true;} }
-	else if (x > cur->x) {if (!cur->r) {return false; } else next = cur->r;}
-
-	return next_rq(next, x, res);
-}
-
-
-bool AVL::prev(const T x, T *res) const noexcept
-{
-	if(!root) return false;
-
-	return prev_rq(root, x, res);
-}
-bool AVL::prev_rq(Node *cur, const T x, T *res) const noexcept
-{
-	if (x == cur->x) 
-	{
-		if(!cur->l) return false;
-		cur = cur->l;
-		if(!cur->r) {*res = cur->x; return true;} 
-		while(cur->r) cur = cur->r;
-		*res = cur->x;
-		return true;
-	}
-	Node *next;
-	if 		(x < cur->x) {if (!cur->l) {return false; } else next = cur->l;}
-	else if (x > cur->x) {*res = cur->x; if (!cur->r) {return true; } else {prev_rq(cur->r, x, res); return true;} }
-
-	return prev_rq(next, x, res);
-}
-
-void AVL::full_print() const noexcept
+void AVL::full_print()
 {
 	printf("n = %zu\n", n);
     size_t ind = 0;
     full_print_rq(root, ind);
 	printf("%d\n", n);
 }
-void AVL::full_print_stream(std::ostream &out) const noexcept
+void AVL::full_print_stream(std::ostream &out)
 {
 	out << n << '\n';
     size_t ind = 0;
@@ -275,7 +276,7 @@ void AVL::full_print_stream(std::ostream &out) const noexcept
 	out << n;
 }
 
-void AVL::full_print_rq(const Node *cur, size_t &ind) const noexcept
+void AVL::full_print_rq(Node *cur, size_t &ind)
 {
 	if(cur == nullptr) return;
 	full_print_rq(cur->l, ind);
@@ -304,7 +305,7 @@ void AVL::full_print_rq(const Node *cur, size_t &ind) const noexcept
     printf("\n");
 }
 
-void AVL::full_print_stream_rq(const Node *cur, size_t &ind, std::ostream &out) const noexcept
+void AVL::full_print_stream_rq(Node *cur, size_t &ind, std::ostream &out)
 {
 	if(cur == nullptr) return;
 	full_print_stream_rq(cur->l, ind, out);
@@ -319,27 +320,27 @@ void AVL::full_print_stream_rq(const Node *cur, size_t &ind, std::ostream &out) 
     out << ' ' << (cur->r ? (int)ind_right	: -1);
     out << '\n';
 }
-void AVL::swap_val(Node *a, Node *b) noexcept
+void AVL::swap_val(Node *a, Node *b)
 {
 	T buf = a->x;
 	a->x = b->x;
 	b->x = buf;
 }
 
-void AVL::swap_childs(Node *cur) noexcept
+void AVL::swap_childs(Node *cur)
 {
 	Node *buf = cur->r;
 	cur->r = cur->l;
 	cur->l = buf;
 }
 
-void AVL::restore_parent(Node *cur) noexcept
+void AVL::restore_parent(Node *cur)
 {
 	if(cur->r) cur->r->p = cur;
 	if(cur->l) cur->l->p = cur;
 }
 
-void AVL::balancing_node(Node* cur) noexcept
+void AVL::balancing_node(Node* cur)
 {
 	size_t deep_l = 0, deep_r = 0;
 	if(cur->l) deep_l = cur->l->deep;
@@ -349,7 +350,7 @@ void AVL::balancing_node(Node* cur) noexcept
 	cur->b = deep_l - deep_r;
 }
 
-void AVL::small_left_rotation(Node *cur) noexcept
+void AVL::small_left_rotation(Node *cur)
 {
 	Node *x = cur;
 	Node *y = x->r;
@@ -368,7 +369,7 @@ void AVL::small_left_rotation(Node *cur) noexcept
 	balancing_node(y);
 	balancing_node(x);
 }
-void AVL::large_left_rotation(Node *cur) noexcept
+void AVL::large_left_rotation(Node *cur)
 {
 	Node *x = cur;
 	Node *y = x->r;
@@ -388,7 +389,7 @@ void AVL::large_left_rotation(Node *cur) noexcept
 	balancing_node(y);
 	balancing_node(x);
 }
-void AVL::small_right_rotation(Node *cur) noexcept
+void AVL::small_right_rotation(Node *cur)
 {
 	Node *x = cur;
 	Node *y = x->l;
@@ -408,7 +409,7 @@ void AVL::small_right_rotation(Node *cur) noexcept
 	balancing_node(x);
 }
 
-void AVL::large_right_rotation(Node *cur) noexcept
+void AVL::large_right_rotation(Node *cur)
 {	
 	Node *x = cur;
 	Node *y = x->l;
@@ -428,7 +429,7 @@ void AVL::large_right_rotation(Node *cur) noexcept
 	balancing_node(y);
 	balancing_node(x);
 }
-void AVL::balancing_tree(Node *cur_root) noexcept
+void AVL::balancing_tree(Node *cur_root)
 {
 	if (cur_root->b == -2)
 	{
@@ -447,7 +448,7 @@ void AVL::balancing_tree(Node *cur_root) noexcept
 
 typedef unsigned long int hash_type;
 
-static constexpr hash_type hash_str(const char str[]) noexcept
+static constexpr hash_type hash_str(const char str[])
 {
     hash_type result=0;
 	for(size_t i=0, m=1; str[i]!='\0'; i++, m*=131)
@@ -461,7 +462,7 @@ constexpr hash_type exists_hash =  hash_str("exists");
 constexpr hash_type next_hash   =  hash_str("next");
 constexpr hash_type prev_hash   =  hash_str("prev");
 
-int main() noexcept
+int main()
 {	
 #ifdef TEST
 	return !full_test();

@@ -15,9 +15,9 @@ private:
 		Node *l = nullptr;
 		Node *r = nullptr;
 
-		Node(const T &x) noexcept : x(x), p(nullptr) {}
-		Node(const T &x, Node *p) noexcept : x(x), p(p) {}
-		~Node() noexcept
+		Node(T &x) : x(x), p(nullptr) {}
+		Node(T &x, Node *p) : x(x), p(p) {}
+		~Node()
 		{
 			delete l;
 			delete r;
@@ -27,36 +27,35 @@ private:
 	Node *root = nullptr;
 
 public:
-	~AVL() noexcept {delete root;} 
+	~AVL() {delete root;}
 
-	bool insert 	(const T x) noexcept;
-	bool del 		(const T x) noexcept;
-	bool exists 	(const T x) 		const noexcept;
-	bool next 		(const T x, T *res) const noexcept;
-	bool prev 		(const T x, T *res) const noexcept;
+	bool insert(T x);
+	bool del(T x);
+	bool exists(T x);
+	bool next(T x, T *res);
+	bool prev(T x, T *res);
 
-	void full_print() const noexcept;
-	void full_print_stream(std::ostream &out) const noexcept;
+	void full_print();
+	void full_print_stream(std::ostream &out);
 
 private:
-	bool insert_rq(Node *cur, const T &x) noexcept;
-	void del_node(Node *cur) noexcept;
-	Node *search_rq(Node *cur, const T &x) const noexcept;
-	bool next_rq(Node *cur, const T x, T *res) const noexcept;
-	bool prev_rq(Node *cur, const T x, T *res) const noexcept;
+	Node *search_rq(Node *cur, T &x);
+	void del_node(Node *cur);
+	bool next_rq(Node *cur, T x, T *res);
+	bool prev_rq(Node *cur, T x, T *res);
 
-	void full_print_rq(const Node *cur, size_t &ind) const noexcept;
-	void full_print_stream_rq(const Node *cur, size_t &ind, std::ostream &out) const noexcept;
-	
-	void swap_val(Node *a, Node *b) noexcept;
-	void swap_childs(Node *cur) noexcept;
-	void restore_parent(Node *cur) noexcept;
-	void balancing_node(Node *cur) noexcept;
-	void small_left_rotation(Node *cur) noexcept;
-	void large_left_rotation(Node *cur) noexcept;
-	void small_right_rotation(Node *cur) noexcept;
-	void large_right_rotation(Node *cur) noexcept;
-	void balancing_tree(Node *cur) noexcept;
+	void full_print_rq(Node *cur, size_t &ind);
+	void full_print_stream_rq(Node *cur, size_t &ind, std::ostream &out);
+	bool insert_rq(Node *cur, T &x);
+	void swap_val(Node *a, Node *b);
+	void swap_childs(Node *cur);
+	void restore_parent(Node *cur);
+	void balancing_node(Node *cur);
+	void small_left_rotation(Node *cur);
+	void large_left_rotation(Node *cur);
+	void small_right_rotation(Node *cur);
+	void large_right_rotation(Node *cur);
+	void balancing_tree(Node *cur);
 };
 
 #endif
