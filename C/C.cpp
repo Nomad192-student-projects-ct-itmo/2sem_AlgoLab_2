@@ -76,13 +76,6 @@ AVL::Node *AVL::search(Node *cur, T &x)
         else if (x < cur->x) {if (!cur->l) {return cur;} else cur = cur->l;}
         else if (x > cur->x) {if (!cur->r) {return cur;} else cur = cur->r;}
     }
-
-	/*if (x == cur->x) {return cur;}
-	Node *next;
-	if 		(x < cur->x) {if (!cur->l) {return cur;} else next = cur->l;}
-	else                 {if (!cur->r) {return cur;} else next = cur->r;}
-
-	return search_rq(next, x);*/
 }
 
 bool AVL::exists(T x)
@@ -119,10 +112,6 @@ bool AVL::next_rq(Node *cur, T x, T *res)
         }
         else if (x > cur->x) {if (!cur->r) {return false;} else cur = cur->r;}
     }
-	//Node *next;
-
-
-	//return next_rq(next, x, res);
 }
 
 
@@ -152,11 +141,6 @@ bool AVL::prev_rq(Node *cur, T x, T *res)
             else {prev_rq(cur->r, x, res); return true;}
         }
     }
-
-
-
-
-	//return prev_rq(next, x, res);
 }
 
 
@@ -252,13 +236,6 @@ void AVL::del_node(Node *cur)
 		delete cur;
 
         fix_balance_top(p_cur);
-
-		/*while(p_cur)
-		{
-			balancing_node(p_cur);
-			balancing_tree(p_cur);
-			p_cur = p_cur->p;
-		} */
 	}
 	else if(cur->r)
 	{
@@ -276,12 +253,6 @@ void AVL::del_node(Node *cur)
 		delete leaf;
 
         fix_balance_top(p_leaf);
-		/*while(p_leaf)
-		{
-			balancing_node(p_leaf);
-			balancing_tree(p_leaf);
-			p_leaf = p_leaf->p;
-		} */
 	}
 	else
 	{
@@ -289,13 +260,7 @@ void AVL::del_node(Node *cur)
 		delete cur->l;
 		cur->l = nullptr;
 
-        //fix_balance_top(cur);
-		/*while(cur)
-		{
-			balancing_node(cur);
-			balancing_tree(cur);
-			cur = cur->p;
-		} */
+        fix_balance_top(cur);
 	}
 }
 
