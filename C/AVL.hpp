@@ -39,23 +39,24 @@ public:
 	void full_print_stream(std::ostream &out);
 
 private:
-	Node *search_rq(Node *cur, T &x);
-	void del_node(Node *cur);
-	bool next_rq(Node *cur, T x, T *res);
-	bool prev_rq(Node *cur, T x, T *res);
+    static Node *search(Node *cur, T &x);
+    void del_node(Node *cur);
+    bool next_rq(Node *cur, T x, T *res);
+    bool prev_rq(Node *cur, T x, T *res);
 
-	void full_print_rq(Node *cur, size_t &ind);
-	void full_print_stream_rq(Node *cur, size_t &ind, std::ostream &out);
-	bool insert_rq(Node *cur, T &x);
-	void swap_val(Node *a, Node *b);
-	void swap_childs(Node *cur);
-	void restore_parent(Node *cur);
-	void balancing_node(Node *cur);
-	void small_left_rotation(Node *cur);
-	void large_left_rotation(Node *cur);
-	void small_right_rotation(Node *cur);
-	void large_right_rotation(Node *cur);
-	void balancing_tree(Node *cur);
+    void fix_balance_top(Node *cur);
+    void full_print_rq(Node *cur, size_t &ind);
+    void full_print_stream_rq(Node *cur, size_t &ind, std::ostream &out);
+    bool insert_rq(Node *cur, T &x);
+    static void swap_val(Node *a, Node *b);
+    static void swap_childs(Node *cur);
+    static void restore_parent(Node *cur);
+    static void balancing_node(Node *cur);
+    static void small_left_rotation(Node *cur);
+    static void large_left_rotation(Node *cur);
+    static void small_right_rotation(Node *cur);
+    static void large_right_rotation(Node *cur);
+    static void balancing_tree(Node *cur);
 };
 
 #endif

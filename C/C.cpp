@@ -1,6 +1,5 @@
 #include <cstdio>
 #include <iostream>
-#include <sstream>
 
 #define MAX(x, y) ((x > y) ? (x) : (y))
 
@@ -24,7 +23,7 @@
 			Node *l = nullptr;
 			Node *r = nullptr;
 
-			Node(T &x) : x(x), p(nullptr) {}
+			explicit Node(T &x) : x(x), p(nullptr) {}
 			Node(T &x, Node *p) : x(x), p(p) {}
 			~Node()
 			{
@@ -48,40 +47,48 @@
 		void full_print_stream(std::ostream &out);
 
 	private:
-		Node *search_rq(Node *cur, T &x);
+		static Node *search(Node *cur, T &x);
 		void del_node(Node *cur);
 		bool next_rq(Node *cur, T x, T *res);
 		bool prev_rq(Node *cur, T x, T *res);
 
+        void fix_balance_top(Node *cur);
 		void full_print_rq(Node *cur, size_t &ind);
 		void full_print_stream_rq(Node *cur, size_t &ind, std::ostream &out);
 		bool insert_rq(Node *cur, T &x);
-		void swap_val(Node *a, Node *b);
-		void swap_childs(Node *cur);
-		void restore_parent(Node *cur);
-		void balancing_node(Node *cur);
-		void small_left_rotation(Node *cur);
-		void large_left_rotation(Node *cur);
-		void small_right_rotation(Node *cur);
-		void large_right_rotation(Node *cur);
-		void balancing_tree(Node *cur);
+		static void swap_val(Node *a, Node *b);
+		static void swap_childs(Node *cur);
+		static void restore_parent(Node *cur);
+		static void balancing_node(Node *cur);
+		static void small_left_rotation(Node *cur);
+		static void large_left_rotation(Node *cur);
+		static void small_right_rotation(Node *cur);
+		static void large_right_rotation(Node *cur);
+		static void balancing_tree(Node *cur);
 	};
 #endif
 
-AVL::Node *AVL::search_rq(Node *cur, T &x)
+AVL::Node *AVL::search(Node *cur, T &x)
 {
-	if (x == cur->x) {return cur;}
+    while (true)
+    {
+        if(x == cur->x) return cur;
+        else if (x < cur->x) {if (!cur->l) {return cur;} else cur = cur->l;}
+        else if (x > cur->x) {if (!cur->r) {return cur;} else cur = cur->r;}
+    }
+
+	/*if (x == cur->x) {return cur;}
 	Node *next;
 	if 		(x < cur->x) {if (!cur->l) {return cur;} else next = cur->l;}
-	else if (x > cur->x) {if (!cur->r) {return cur;} else next = cur->r;}
+	else                 {if (!cur->r) {return cur;} else next = cur->r;}
 
-	return search_rq(next, x);
+	return search_rq(next, x);*/
 }
 
 bool AVL::exists(T x)
 {
 	if(!root) return false;
-	Node *cur = search_rq(root, x);
+	Node *cur = search(root, x);
 	if(cur->x == x) return true;
 	return false;
 }
@@ -94,20 +101,28 @@ bool AVL::next(T x, T *res)
 }
 bool AVL::next_rq(Node *cur, T x, T *res)
 {
-	if (x == cur->x) 
-	{
-		if(!cur->r) return false;
-		cur = cur->r;
-		if(!cur->l) {*res = cur->x; return true;} 
-		while(cur->l) cur = cur->l;
-		*res = cur->x;
-		return true;
-	}
-	Node *next;
-	if 		(x < cur->x) {*res = cur->x; if (!cur->l) {return true; } else {next_rq(cur->l, x, res); return true;} }
-	else if (x > cur->x) {if (!cur->r) {return false; } else next = cur->r;}
+    while(true)
+    {
+        if (x == cur->x)
+        {
+            if(!cur->r) return false;
+            cur = cur->r;
+            if(!cur->l) {*res = cur->x; return true;}
+            while(cur->l) cur = cur->l;
+            *res = cur->x;
+            return true;
+        }
+        else if (x < cur->x) {
+            *res = cur->x;
+            if (!cur->l) {return true;}
+            else {next_rq(cur->l, x, res); return true;}
+        }
+        else if (x > cur->x) {if (!cur->r) {return false;} else cur = cur->r;}
+    }
+	//Node *next;
 
-	return next_rq(next, x, res);
+
+	//return next_rq(next, x, res);
 }
 
 
@@ -119,20 +134,29 @@ bool AVL::prev(T x, T *res)
 }
 bool AVL::prev_rq(Node *cur, T x, T *res)
 {
-	if (x == cur->x) 
-	{
-		if(!cur->l) return false;
-		cur = cur->l;
-		if(!cur->r) {*res = cur->x; return true;} 
-		while(cur->r) cur = cur->r;
-		*res = cur->x;
-		return true;
-	}
-	Node *next;
-	if 		(x < cur->x) {if (!cur->l) {return false; } else next = cur->l;}
-	else if (x > cur->x) {*res = cur->x; if (!cur->r) {return true; } else {prev_rq(cur->r, x, res); return true;} }
+    while(true)
+    {
+        if (x == cur->x)
+        {
+            if(!cur->l) return false;
+            cur = cur->l;
+            if(!cur->r) {*res = cur->x; return true;}
+            while(cur->r) cur = cur->r;
+            *res = cur->x;
+            return true;
+        }
+        else if	(x < cur->x) {if (!cur->l) {return false;} else cur = cur->l;}
+        else if (x > cur->x) {
+            *res = cur->x;
+            if (!cur->r) {return true;}
+            else {prev_rq(cur->r, x, res); return true;}
+        }
+    }
 
-	return prev_rq(next, x, res);
+
+
+
+	//return prev_rq(next, x, res);
 }
 
 
@@ -182,7 +206,39 @@ bool AVL::insert_rq(Node *cur, T &x)
     return false;  ///x there is in the tree
 }
 
+void AVL::fix_balance_top(Node *cur)
+{
+    while(cur)
+    {
+        balancing_node(cur);
+        balancing_tree(cur);
+        cur = cur->p;
+    }
+}
 
+bool AVL::del(T x)
+{
+    if(!root) return false;
+
+    if(root->x == x)
+    {
+        if(!root->l && !root->r)
+        {
+            n--;
+            delete root;
+            root = nullptr;
+            return true;
+        }
+        del_node(root);
+        return true;
+    }
+
+    Node *cur = search(root, x);
+    if(cur->x != x)
+        return false;
+    del_node(cur);
+    return true;
+}
 void AVL::del_node(Node *cur)
 {
 	n--;
@@ -191,20 +247,23 @@ void AVL::del_node(Node *cur)
 		Node *p_cur = cur->p;
 
 		if(p_cur->l == cur) p_cur->l = nullptr;
-		else 				p_cur->r = nullptr;	
-		delete cur;	
+		else 				p_cur->r = nullptr;
 
-		while(p_cur)
+		delete cur;
+
+        fix_balance_top(p_cur);
+
+		/*while(p_cur)
 		{
 			balancing_node(p_cur);
 			balancing_tree(p_cur);
 			p_cur = p_cur->p;
-		} 
+		} */
 	}
 	else if(cur->r)
 	{
 		Node *leaf;
-		leaf = search_rq(cur->r, cur->x);
+		leaf = search(cur->r, cur->x);
 		Node *p_leaf = leaf->p;
 
 		if(p_leaf->l == leaf)	p_leaf->l = leaf->r; 
@@ -215,50 +274,29 @@ void AVL::del_node(Node *cur)
 		cur->x = leaf->x;
 		leaf->r = nullptr;
 		delete leaf;
-		while(p_leaf)
+
+        fix_balance_top(p_leaf);
+		/*while(p_leaf)
 		{
 			balancing_node(p_leaf);
 			balancing_tree(p_leaf);
 			p_leaf = p_leaf->p;
-		} 
+		} */
 	}
 	else
 	{
 		swap_val(cur, cur->l);
 		delete cur->l;
 		cur->l = nullptr;
-		while(cur)
+
+        //fix_balance_top(cur);
+		/*while(cur)
 		{
 			balancing_node(cur);
 			balancing_tree(cur);
 			cur = cur->p;
-		} 
+		} */
 	}
-
-}
-
-bool AVL::del(T x)
-{
-	if(!root) return false;
-
-	if(root->x == x)
-	{
-		if(!root->l && !root->r)
-		{
-			n--;
-			delete root;
-			root = nullptr;
-			return true;
-		}
-		del_node(root);
-		return true;
-	}
-
-	Node *cur = search_rq(root, x);
-	if(cur->x != x)
-		return false;
-	del_node(cur);
-	return true;
 }
 
 void AVL::full_print()
@@ -347,7 +385,7 @@ void AVL::balancing_node(Node* cur)
 	if(cur->r) deep_r = cur->r->deep;	
 
 	cur->deep = MAX(deep_l, deep_r) + 1;
-	cur->b = deep_l - deep_r;
+	cur->b = (signed char)(deep_l - deep_r);
 }
 
 void AVL::small_left_rotation(Node *cur)
