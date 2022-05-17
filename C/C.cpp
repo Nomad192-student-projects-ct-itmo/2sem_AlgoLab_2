@@ -49,8 +49,8 @@
 	private:
 		static Node *search(Node *cur, T &x);
 		void del_node(Node *cur);
-		bool next_rq(Node *cur, T x, T *res);
-		bool prev_rq(Node *cur, T x, T *res);
+		bool next_below(Node *cur, T x, T *res);
+		bool prev_below(Node *cur, T x, T *res);
 
         void fix_balance_top(Node *cur);
 		void full_print_rq(Node *cur, size_t &ind);
