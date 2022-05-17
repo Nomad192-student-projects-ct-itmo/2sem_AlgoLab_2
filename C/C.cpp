@@ -90,9 +90,9 @@ bool AVL::next(T x, T *res)
 {
 	if(!root) return false;
 
-	return next_rq(root, x, res);
+	return next_below(root, x, res);
 }
-bool AVL::next_rq(Node *cur, T x, T *res)
+bool AVL::next_below(Node *cur, T x, T *res)
 {
     while(true)
     {
@@ -108,7 +108,7 @@ bool AVL::next_rq(Node *cur, T x, T *res)
         else if (x < cur->x) {
             *res = cur->x;
             if (!cur->l) {return true;}
-            else {next_rq(cur->l, x, res); return true;}
+            else {next_below(cur->l, x, res); return true;}
         }
         else if (x > cur->x) {if (!cur->r) {return false;} else cur = cur->r;}
     }
@@ -119,9 +119,9 @@ bool AVL::prev(T x, T *res)
 {
 	if(!root) return false;
 
-	return prev_rq(root, x, res);
+	return prev_below(root, x, res);
 }
-bool AVL::prev_rq(Node *cur, T x, T *res)
+bool AVL::prev_below(Node *cur, T x, T *res)
 {
     while(true)
     {
@@ -138,7 +138,7 @@ bool AVL::prev_rq(Node *cur, T x, T *res)
         else if (x > cur->x) {
             *res = cur->x;
             if (!cur->r) {return true;}
-            else {prev_rq(cur->r, x, res); return true;}
+            else {prev_below(cur->r, x, res); return true;}
         }
     }
 }
