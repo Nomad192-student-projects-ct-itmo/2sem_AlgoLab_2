@@ -481,7 +481,7 @@ int main()
 			{
 				//printf("insert\n");
                 TREE_TYPE x;
-                scanf("%u", &x);
+                scanf("%" TREE_TYPE_SP, &x);
                 tree.insert(x);
 				break;
 			}
@@ -489,7 +489,7 @@ int main()
 			{
 				//printf("delete\n");
                 TREE_TYPE x;
-                scanf("%u", &x);
+                scanf("%" TREE_TYPE_SP, &x);
                 tree.del(x);
 				break;
 			}
@@ -497,7 +497,7 @@ int main()
 			{
 				//printf("exists\n");
                 TREE_TYPE x;
-                scanf("%u", &x);
+                scanf("%" TREE_TYPE_SP, &x);
                 printf("%s\n", tree.exists(x) ? "true" : "false");
 				break;
 			}
@@ -505,7 +505,7 @@ int main()
 			{
 				//printf("next\n")'
                 TREE_TYPE x;
-                scanf("%u", &x);
+                scanf("%" TREE_TYPE_SP, &x);
                 TREE_TYPE res;
                 if(tree.next(x, &res))
                 	printf("%" TREE_TYPE_SP "\n", res);
@@ -517,7 +517,7 @@ int main()
 			{
 				//printf("prev\n")'
                 TREE_TYPE x;
-                scanf("%u", &x);
+                scanf("%" TREE_TYPE_SP, &x);
                 TREE_TYPE res;
                 if(tree.prev(x, &res))
                 	printf("%" TREE_TYPE_SP "\n", res);
