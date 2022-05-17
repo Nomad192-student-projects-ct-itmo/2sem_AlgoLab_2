@@ -6,8 +6,9 @@
 #define TREE_TYPE unsigned int
 #define TREE_TYPE_SP "u"
 
+#define TEST
 #ifdef TEST
-	#include "C_Test.hpp"
+	#include "F_Test.hpp"
 #else
 	class AVL
 	{
@@ -78,7 +79,9 @@ AVL::T AVL::sum(T l, T r)
 	Node *l_node = search(root, l);
 	Node *r_node = search(root, r);
 
-	//printf("a");
+	if(!l_node) printf("A");
+	if(!r_node) printf("B");
+
 	if(l_node->x != l) {
 		//printf("b");
 		T x; if(!next_below(root, l, &l_node, &x)) {return 0;} }	
@@ -86,12 +89,21 @@ AVL::T AVL::sum(T l, T r)
 		//printf("c");
 		T x; if(!prev_below(root, r, &r_node, &x)) {return 0;} }
 
+	if(!l_node) printf("C");
+	if(!r_node) printf("D");
+
+	if(l_node->x > r) return 0;
+	if(r_node->x < l) return 0;
+
 	if(l_node == r_node) return l_node->x;
 
 	//printf("d");
+	T sum_l = 0, sum_r = 0;
+	if(l_node->l)
+		sum_l = l_node->l->x + l_node->l->sum;
 
-	T sum_l = l_node->sum;
-	T sum_r = r_node->sum;	
+	if(r_node->r)
+		sum_r = r_node->r->x + r_node->r->sum;	
 
 	while(l_node->deep > r_node->deep) l_node = l_node->p;	
 	if(l_node == r_node) return l_node->x + l_node->l->sum + l_node->l->x - sum_l; 
