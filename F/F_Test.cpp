@@ -80,12 +80,12 @@ static void update_loadbar(size_t length, size_t n_attempt)
 
 bool full_test()
 {
-	printf("len test, range: 1 - %u, n tests = %d\n", TEST_LEN_OP, N_TEST);
-	Req *req_arr = new Req[TEST_LEN_OP];
+	printf("len test, range: [%u - %u], n tests = %d\n", OFFSET_LEN_OP, TEST_LEN_OP + OFFSET_LEN_OP - 1, N_TEST);
+	Req *req_arr = new Req[OFFSET_LEN_OP + TEST_LEN_OP];
 	int start = clock();
 	int all = start;
 	printf("\tlen test [   0%]");
-	for (size_t length = 1; length <= TEST_LEN_OP; length++)
+	for (size_t length = OFFSET_LEN_OP; length < TEST_LEN_OP + OFFSET_LEN_OP; length++)
     {
 
     	for(size_t n_attempt = 0; n_attempt < N_TEST; n_attempt++)
@@ -102,6 +102,8 @@ bool full_test()
 
         	for(size_t i = 0; i < length; i++)
         	{
+        		//if(i%(length/100) == 0) printf("%zu\n", i/(length/100));
+
         		req_arr[i] = Req(Req::Type(rand() % 2), (rand() % RANGE_VAL) + OFFSET_VAL);
         		switch(req_arr[i].type)
         		{
@@ -122,12 +124,12 @@ bool full_test()
         			case Req::Type::SUM:
         			{
         				req_arr[i].y = (rand() % RANGE_VAL) + OFFSET_VAL;
-        				TREE_TYPE res 		= tree.sum			(req_arr[i].x, req_arr[i].y); 
-        				TREE_TYPE res_test 	= test_tree.sum 	(req_arr[i].x, req_arr[i].y);
+        				TREE_TYPE_SUM res 		= tree.sum			(req_arr[i].x, req_arr[i].y); 
+        				TREE_TYPE_SUM res_test 	= test_tree.sum 	(req_arr[i].x, req_arr[i].y);
         				if(res != res_test)
         				{
         					update_loadbar(length, n_attempt);
-        					printf("\ttree = %" TREE_TYPE_SP ", test = %" TREE_TYPE_SP "\n", res, res_test);
+        					printf("\ttree = %" TREE_TYPE_SUM_SP ", test = %" TREE_TYPE_SUM_SP "\n", res, res_test);
 							print_error("sum", i+1, req_arr, &tree);
 							delete[] req_arr;
 							return false;

@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_compile_definitions(TREE_TYPE=unsigned\ int)
 add_compile_definitions(TREE_TYPE_SP="u")
+add_compile_definitions(TREE_TYPE_SUM=unsigned\ long\ long\ int)
+add_compile_definitions(TREE_TYPE_SUM_SP="llu")
 
 add_library(AlmostTree STATIC AlmostTree.hpp AlmostTree.cpp)
 add_library(F_Test STATIC AVL.hpp F_Test.hpp F_Test.cpp)

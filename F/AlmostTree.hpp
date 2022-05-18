@@ -8,6 +8,7 @@ class AlmostTree ///List
 {
 private:
 	typedef TREE_TYPE T;
+	typedef TREE_TYPE_SUM TS;
 	struct Node
 	{
 		T x;
@@ -26,6 +27,6 @@ public:
 	bool 	exists 	(const T x) 			const 	noexcept;
 	bool 	next 	(const T x, T *next) 	const 	noexcept;
 	bool 	prev 	(const T x, T *prev) 	const 	noexcept;
-	T 		sum 	(const T l, const T r)	const 	noexcept; 
+	TS 		sum 	(const T l, const T r)	const 	noexcept; 
 };
 #endif

@@ -4,9 +4,11 @@
 #define MAX(x, y) ((x > y) ? (x) : (y))
 
 #define TREE_TYPE unsigned int
-#define TREE_TYPE_SP "u"
+#define TREE_TYPE_SP "d"
+#define TREE_TYPE_SUM unsigned long long int
+#define TREE_TYPE_SUM_SP "lld"
 
-#define TEST
+//#define TEST
 #ifdef TEST
 	#include "F_Test.hpp"
 #else
@@ -14,13 +16,15 @@
 	{
 	private:
 		typedef TREE_TYPE T;
+		typedef TREE_TYPE_SUM TS;
+
 		struct Node
 		{
 			T x;
 			signed char b = 0;
 			size_t h = 1;
 			size_t deep;
-			T sum = 0;
+			TS sum = 0;
 			Node *p;
 			Node *l = nullptr;
 			Node *r = nullptr;
@@ -44,16 +48,17 @@
 		bool exists(T x);
 		bool next(T x, T *res);
 		bool prev(T x, T *res);
-		T sum(T l, T r);
+		TS sum(T l, T r);
 
 		void full_print();
 		void print_stream(std::ostream &out);
 
 	private:
 		static Node *search(Node *cur, T &x);
+		static Node *search(Node *cur, T &x, size_t s_deep, size_t *deep);
 		void del_node(Node *cur);
-		bool next_below(Node *cur, T x, Node **res_node, T *res);
-		bool prev_below(Node *cur, T x, Node **res_node, T *res);
+		bool next_below(Node *cur, T x, Node **res_node, T *res, size_t s_deep, size_t *deep);
+		bool prev_below(Node *cur, T x, Node **res_node, T *res, size_t s_deep, size_t *deep);
 
         void fix_balance_top(Node *cur);
 		void full_print_rq(Node *cur, size_t &ind);
@@ -71,26 +76,29 @@
 	};
 #endif
 
-AVL::T AVL::sum(T l, T r)
+AVL::TS AVL::sum(T l, T r)
 {
 	if(!root) return 0;
 	if(l > r) return 0;
 
-	Node *l_node = search(root, l);
-	Node *r_node = search(root, r);
+	size_t l_deep = 0;
+	size_t r_deep = 0;
 
-	if(!l_node) printf("A");
-	if(!r_node) printf("B");
+	Node *l_node = search(root, l, 1, &l_deep);
+	Node *r_node = search(root, r, 1, &r_deep);
+
+	//if(!l_node) printf("A");
+	//if(!r_node) printf("B");
 
 	if(l_node->x != l) {
 		//printf("b");
-		T x; if(!next_below(root, l, &l_node, &x)) {return 0;} }	
+		T x; if(!next_below(root, l, &l_node, &x, 1, &l_deep)) {return 0;} }	
 	if(r_node->x != r) {
 		//printf("c");
-		T x; if(!prev_below(root, r, &r_node, &x)) {return 0;} }
+		T x; if(!prev_below(root, r, &r_node, &x, 1, &r_deep)) {return 0;} }
 
-	if(!l_node) printf("C");
-	if(!r_node) printf("D");
+	//if(!l_node) printf("C");
+	//if(!r_node) printf("D");
 
 	if(l_node->x > r) return 0;
 	if(r_node->x < l) return 0;
@@ -98,25 +106,61 @@ AVL::T AVL::sum(T l, T r)
 	if(l_node == r_node) return l_node->x;
 
 	//printf("d");
-	T sum_l = 0, sum_r = 0;
-	if(l_node->l)
-		sum_l = l_node->l->x + l_node->l->sum;
+	TS sum_l = 0, sum_r = 0;
+	//if(l_node->l)
+	//	sum_l = l_node->l->x + l_node->l->sum;
 
-	if(r_node->r)
-		sum_r = r_node->r->x + r_node->r->sum;	
+	//if(r_node->r)
+	//	sum_r = r_node->r->x + r_node->r->sum;	
 
-	while(l_node->deep > r_node->deep) l_node = l_node->p;	
-	if(l_node == r_node) return l_node->x + l_node->l->sum + l_node->l->x - sum_l; 
+	//printf("%zu %zu\n", l_deep, r_deep);
 
-	while(l_node->deep  < r_node->deep) r_node = r_node->p;	
-	if(l_node == r_node) return l_node->x + l_node->r->sum + l_node->r->x - sum_r;
+	while(l_deep > r_deep)
+	{
+		//if(!l_node) //printf("WA");
+		if(l_node->x >= l)
+		{
+			sum_l += l_node->x;
+			if(l_node->r) sum_l += l_node->r->sum + l_node->r->x;
+		}
+		l_node = l_node->p;
+		l_deep--;
+	}
+	if(l_node == r_node) return sum_l + r_node->x;
+
+	while(l_deep  < r_deep)
+	{
+		//if(!r_node) printf("WB");
+		if(r_node->x <= r)
+		{
+			sum_r += r_node->x;
+			if(r_node->l) sum_r += r_node->l->sum + r_node->l->x;
+		}
+		r_node = r_node->p;
+		r_deep--;
+	} 	
+	if(l_node == r_node) return sum_r + l_node->x;
 
 	while(l_node != r_node)
 	{
+		//if(!l_node) {printf("WWA"); printf("%d %d\n", l, r); full_print();}
+		//if(!r_node) {printf("WWB"); printf("%d %d\n", l, r); full_print();}
+		if(l_node->x >= l)
+		{
+			sum_l += l_node->x;
+			if(l_node->r) sum_l += l_node->r->sum + l_node->r->x;
+		}
+		if(r_node->x <= r)
+		{
+			sum_r += r_node->x;
+			if(r_node->l) sum_r += r_node->l->sum + r_node->l->x;
+		}
+
 		l_node = l_node->p;
 		r_node = r_node->p;	
 	}
-	return l_node->x + l_node->sum - sum_l - sum_r;
+	l_node->x + sum_l + sum_r;
+	return l_node->x + sum_l + sum_r;
 }
 
 AVL::Node *AVL::search(Node *cur, T &x)
@@ -126,6 +170,16 @@ AVL::Node *AVL::search(Node *cur, T &x)
         if(x == cur->x) return cur;
         else if (x < cur->x) {if (!cur->l) {return cur;} else cur = cur->l;}
         else if (x > cur->x) {if (!cur->r) {return cur;} else cur = cur->r;}
+    }
+}
+
+AVL::Node *AVL::search(Node *cur, T &x, size_t s_deep, size_t *deep)
+{
+    for(size_t i = s_deep; true; ++i)
+    {
+        if(x == cur->x) {*deep = i; return cur;}
+        else if (x < cur->x) {if (!cur->l) {*deep = i; return cur;} else cur = cur->l;}
+        else if (x > cur->x) {if (!cur->r) {*deep = i; return cur;} else cur = cur->r;}
     }
 }
 
@@ -141,27 +195,31 @@ bool AVL::next(T x, T *res)
 {
 	if(!root) return false;
 	Node *res_node = nullptr;
-	return next_below(root, x, &res_node, res);
+	size_t deep = 0;
+	return next_below(root, x, &res_node, res, 1, &deep);
 }
-bool AVL::next_below(Node *cur, T x, Node **res_node, T *res)
+bool AVL::next_below(Node *cur, T x, Node **res_node, T *res, size_t s_deep, size_t *deep)
 {
-    while(true)
+
+    for(size_t i = s_deep; true; ++i)
     {
         if (x == cur->x)
         {
             if(!cur->r) return false;
             cur = cur->r;
-            if(!cur->l) {*res = cur->x; return true;}
-            while(cur->l) cur = cur->l;
+            if(!cur->l) {*deep = i; *res = cur->x; *res_node = cur; return true;}
+            for(;cur->l;++i) cur = cur->l;
+            *deep = i;
             *res = cur->x;
             *res_node = cur;
             return true;
         }
         else if (x < cur->x) {
+        	*deep = i;
             *res = cur->x;
             *res_node = cur;
             if (!cur->l) {return true;}
-            else {next_below(cur->l, x, res_node, res); return true;}
+            else {next_below(cur->l, x, res_node, res, i+1, deep); return true;}
         }
         else if (x > cur->x) {if (!cur->r) {return false;} else cur = cur->r;}
     }
@@ -172,28 +230,31 @@ bool AVL::prev(T x, T *res)
 {
 	if(!root) return false;
 	Node *res_node = nullptr;
-	return prev_below(root, x, &res_node, res);
+	size_t deep;
+	return prev_below(root, x, &res_node, res, 1, &deep);
 }
-bool AVL::prev_below(Node *cur, T x, Node **res_node, T *res)
+bool AVL::prev_below(Node *cur, T x, Node **res_node, T *res, size_t s_deep, size_t *deep)
 {
-    while(true)
+    for(size_t i = s_deep; true; ++i)
     {
         if (x == cur->x)
         {
             if(!cur->l) return false;
             cur = cur->l;
-            if(!cur->r) {*res = cur->x; return true;}
-            while(cur->r) cur = cur->r;
+            if(!cur->r) {*deep = i; *res = cur->x; *res_node = cur; return true;}
+            for(;cur->r;++i) cur = cur->r;
+            *deep = i;
             *res = cur->x;
             *res_node = cur;
             return true;
         }
         else if	(x < cur->x) {if (!cur->l) {return false;} else cur = cur->l;}
         else if (x > cur->x) {
+        	*deep = i;
             *res = cur->x;
             *res_node = cur;
             if (!cur->r) {return true;}
-            else {prev_below(cur->r, x, res_node, res); return true;}
+            else {prev_below(cur->r, x, res_node, res, i+1, deep); return true;}
         }
     }
 }
@@ -344,7 +405,7 @@ void AVL::full_print_rq(Node *cur, size_t &ind)
     
     ind++;
 
-    printf("%-2zu - x=%-2" TREE_TYPE_SP " sum=%-2" TREE_TYPE_SP " h=%-2zu d=%-2zu b=%-2hhd -", ind, cur->x, cur->sum, cur->h, cur->deep, cur->b);
+    printf("%-2zu - x=%-2" TREE_TYPE_SP " sum=%-3" TREE_TYPE_SP " h=%-2zu d=%-2zu b=%-2hhd -", ind, cur->x, cur->sum, cur->h, cur->deep, cur->b);
 
     if(cur->p)
     	printf(" p=%-2" TREE_TYPE_SP "", cur->p->x);
@@ -401,7 +462,7 @@ void AVL::restore_childs(Node *cur)
 void AVL::balancing_node(Node* cur)
 {
 	size_t h_l = 0, h_r = 0;
-	T sum_l = 0, sum_r = 0;
+	TS sum_l = 0, sum_r = 0;
 	if(Node *cd = cur->l) {h_l = cd->h; sum_l = cd->sum + cd->x;}
 	if(Node *cd = cur->r) {h_r = cd->h; sum_r = cd->sum + cd->x;}
 
@@ -518,7 +579,7 @@ int main()
 	scanf("%zu\n", &n);
 
 	char prev_op = '+';
-	char prev_res;
+	TREE_TYPE_SUM prev_res;
 
 	while(n--)
 	{
@@ -534,7 +595,7 @@ int main()
                 if(prev_op == '+')
             	    tree.insert(x);
             	else
-            		tree.insert((x + prev_res)%1000000000);
+            		tree.insert(((TREE_TYPE_SUM)(x + prev_res%1000000000))%1000000000);
 
             	prev_op = '+';
 				break;
@@ -545,7 +606,7 @@ int main()
 				scanf("%" TREE_TYPE_SP " %" TREE_TYPE_SP, &l, &r);
 
 				prev_res = tree.sum(l, r);
-                printf("%" TREE_TYPE_SP "\n", prev_res);
+                printf("%" TREE_TYPE_SUM_SP "\n", prev_res);
                 prev_op = '?';
 				break;
 			}

@@ -6,13 +6,14 @@ class AVL
 {
 private:
 	typedef TREE_TYPE T;
+	typedef TREE_TYPE_SUM TS;	
 	struct Node
 	{
 		T x;
 		signed char b = 0;
 		size_t h = 1;
 		size_t deep;
-		T sum = 0;
+		TS sum = 0;
 		Node *p;
 		Node *l = nullptr;
 		Node *r = nullptr;
@@ -36,16 +37,18 @@ public:
 	bool exists(T x);
 	bool next(T x, T *res);
 	bool prev(T x, T *res);
-	T sum(T l, T r);
+	TS sum(T l, T r);
 
 	void full_print();
 	void print_stream(std::ostream &out);
 
 private:
 	static Node *search(Node *cur, T &x);
+	static Node *search(Node *cur, T &x, size_t s_deep, size_t *deep);
 	void del_node(Node *cur);
-	bool next_below(Node *cur, T x, Node **res_node, T *res);
-	bool prev_below(Node *cur, T x, Node **res_node, T *res);
+	bool next_below(Node *cur, T x, Node **res_node, T *res, size_t s_deep, size_t *deep);
+	bool prev_below(Node *cur, T x, Node **res_node, T *res, size_t s_deep, size_t *deep);
+
 
     void fix_balance_top(Node *cur);
 	void full_print_rq(Node *cur, size_t &ind);

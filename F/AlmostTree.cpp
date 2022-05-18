@@ -121,10 +121,10 @@ bool AlmostTree::prev(const T x, T *prev) const noexcept
 	return true;
 }
 
-AlmostTree::T AlmostTree::sum (const T l, const T r) const noexcept
+AlmostTree::TS AlmostTree::sum (const T l, const T r) const noexcept
 {
 	Node *cur = first;
-	T sum = 0;
+	AlmostTree::TS sum = 0;
 	while(cur)
 	{
 		if(cur->x >= l && cur->x <= r)
