@@ -8,7 +8,7 @@
 
 //#define TEST
 #ifdef TEST
-	#include "C_Test.hpp"
+	#include "D_Test.hpp"
 #else
 	class AVL
 	{
@@ -541,23 +541,23 @@ int main()
 
 /* 
  * quick start
-cd 2sem_AlgoLab_2\C\build
+cd 2sem_AlgoLab_2\D\build
 ..\..\run_cmake\run
 
  * set 
 mkdir build & cd build & cmake -G "MinGW Makefiles" ..
 
 * build and run
-cmake --build . && (echo START & C)
+cmake --build . && (echo START & D)
 echo return code: %errorlevel%
 
 * or
 ..\..\run_cmake\run
 
 * move
-cd 2sem_AlgoLab_2\C\build
-cd 2sem_AlgoLab_2\C
-cd C\build
+cd 2sem_AlgoLab_2\D\build
+cd 2sem_AlgoLab_2\D
+cd D\build
 
 * update run_cmake
 git submodule update --remote
