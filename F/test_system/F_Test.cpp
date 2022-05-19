@@ -294,6 +294,12 @@ bool full_test()
 					return false;
 		    	}*/
         	}
+			/*if(!testIsTree(tree))
+	    	{
+				print_error("tree", i+1, req_arr, &tree);
+				delete[] req_arr;
+				return false;
+	    	}*/
     	}
     }
     delete[] req_arr;
