@@ -8,7 +8,7 @@
 
 //#define TEST
 #ifdef TEST
-	#include "D_Test.hpp"
+	#include "test_system/D_Test.hpp"
 #else
 	class AVL
 	{
