@@ -4,15 +4,17 @@
 !/A/
 !/B/
 !/C/
-
+!/F/
 
 !*.c
 !*.h
 !*.cpp
+!*.hpp
 !*.md
 !CMakeLists.txt
 !*.git*
 !/run_cmake
+!/*/test_system
 cmake-build-debug
 debug
 build

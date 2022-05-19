@@ -1,6 +1,6 @@
-#include "AlmostTree.h"
-#include "TestTree.h"
-#include "C_Test.h"
+#include "AlmostTree.hpp"
+#include "TestTree.hpp"
+#include "C_Test.hpp"
 #include <ctime>
 
 bool test(class AVL &tree)
