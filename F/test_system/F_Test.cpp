@@ -80,7 +80,7 @@ static void update_loadbar(size_t length, size_t n_attempt)
 
 bool full_test()
 {
-	printf("len test, range: [%u - %u], n tests = %d\n", OFFSET_LEN_OP, TEST_LEN_OP + OFFSET_LEN_OP - 1, N_TEST);
+	printf("len test, range: [%u - %u], n tests = %d for each value from the range.\n", OFFSET_LEN_OP, TEST_LEN_OP + OFFSET_LEN_OP - 1, N_TEST);
 	Req *req_arr = new Req[OFFSET_LEN_OP + TEST_LEN_OP];
 	int start = clock();
 	int all = start;
@@ -91,7 +91,7 @@ bool full_test()
     	for(size_t n_attempt = 0; n_attempt < N_TEST; n_attempt++)
         {
         	int end = clock();
-	    	if(((length-1)*N_TEST + n_attempt) % (TEST_LEN_OP*N_TEST/N_TEST_POINT) == 0 && end - start >= 400)
+	    	if(((length-1)*N_TEST + n_attempt) % (TEST_LEN_OP*N_TEST/N_TEST_POINT) == 0 && end - start >= 500)
 	    	{
 	    		start = clock();
 	    		update_loadbar(length, n_attempt);
@@ -142,7 +142,6 @@ bool full_test()
     	}
     }
     delete[] req_arr;
-    //printf("\r\tlen test 100%% - OK\n");
     printf("\b\b\b\b\b\b100%%] - OK\n");
     float t = clock();
     t -= all;

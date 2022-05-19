@@ -4,13 +4,13 @@
 #define MAX(x, y) ((x > y) ? (x) : (y))
 
 #define TREE_TYPE unsigned int
-#define TREE_TYPE_SP "d"
+#define TREE_TYPE_SP "u"
 #define TREE_TYPE_SUM unsigned long long int
-#define TREE_TYPE_SUM_SP "lld"
+#define TREE_TYPE_SUM_SP "llu"
 
 //#define TEST
 #ifdef TEST
-	#include "F_Test.hpp"
+	#include "test_system/F_Test.hpp"
 #else
 	class AVL
 	{
@@ -23,14 +23,13 @@
 			T x;
 			signed char b = 0;
 			size_t h = 1;
-			size_t deep;
 			TS sum = 0;
 			Node *p;
 			Node *l = nullptr;
 			Node *r = nullptr;
 
-			explicit Node(T &x) : x(x), p(nullptr), deep(1) {}
-			Node(T &x, Node *p) : x(x), p(p), deep(p->deep + 1) {}
+			explicit Node(T &x) : x(x), p(nullptr) {}
+			Node(T &x, Node *p) : x(x), p(p) {}
 			~Node()
 			{
 				delete l;
@@ -87,37 +86,18 @@ AVL::TS AVL::sum(T l, T r)
 	Node *l_node = search(root, l, 1, &l_deep);
 	Node *r_node = search(root, r, 1, &r_deep);
 
-	//if(!l_node) printf("A");
-	//if(!r_node) printf("B");
-
 	if(l_node->x != l) {
-		//printf("b");
-		T x; if(!next_below(root, l, &l_node, &x, 1, &l_deep)) {return 0;} }	
+		T x; if(!next_below(root, l, &l_node, &x, 1, &l_deep)) return 0;}	
 	if(r_node->x != r) {
-		//printf("c");
-		T x; if(!prev_below(root, r, &r_node, &x, 1, &r_deep)) {return 0;} }
-
-	//if(!l_node) printf("C");
-	//if(!r_node) printf("D");
+		T x; if(!prev_below(root, r, &r_node, &x, 1, &r_deep)) return 0;}
 
 	if(l_node->x > r) return 0;
 	if(r_node->x < l) return 0;
 
-	if(l_node == r_node) return l_node->x;
-
-	//printf("d");
 	TS sum_l = 0, sum_r = 0;
-	//if(l_node->l)
-	//	sum_l = l_node->l->x + l_node->l->sum;
-
-	//if(r_node->r)
-	//	sum_r = r_node->r->x + r_node->r->sum;	
-
-	//printf("%zu %zu\n", l_deep, r_deep);
 
 	while(l_deep > r_deep)
 	{
-		//if(!l_node) //printf("WA");
 		if(l_node->x >= l)
 		{
 			sum_l += l_node->x;
@@ -130,7 +110,6 @@ AVL::TS AVL::sum(T l, T r)
 
 	while(l_deep  < r_deep)
 	{
-		//if(!r_node) printf("WB");
 		if(r_node->x <= r)
 		{
 			sum_r += r_node->x;
@@ -143,8 +122,6 @@ AVL::TS AVL::sum(T l, T r)
 
 	while(l_node != r_node)
 	{
-		//if(!l_node) {printf("WWA"); printf("%d %d\n", l, r); full_print();}
-		//if(!r_node) {printf("WWB"); printf("%d %d\n", l, r); full_print();}
 		if(l_node->x >= l)
 		{
 			sum_l += l_node->x;
@@ -159,7 +136,6 @@ AVL::TS AVL::sum(T l, T r)
 		l_node = l_node->p;
 		r_node = r_node->p;	
 	}
-	l_node->x + sum_l + sum_r;
 	return l_node->x + sum_l + sum_r;
 }
 
@@ -172,7 +148,6 @@ AVL::Node *AVL::search(Node *cur, T &x)
         else if (x > cur->x) {if (!cur->r) {return cur;} else cur = cur->r;}
     }
 }
-
 AVL::Node *AVL::search(Node *cur, T &x, size_t s_deep, size_t *deep)
 {
     for(size_t i = s_deep; true; ++i)
@@ -224,7 +199,6 @@ bool AVL::next_below(Node *cur, T x, Node **res_node, T *res, size_t s_deep, siz
         else if (x > cur->x) {if (!cur->r) {return false;} else cur = cur->r;}
     }
 }
-
 
 bool AVL::prev(T x, T *res)
 {
@@ -380,65 +354,6 @@ void AVL::del_node(Node *cur)
 	}
 }
 
-void AVL::full_print()
-{
-	printf("n = %zu\n", n);
-    size_t ind = 0;
-    full_print_rq(root, ind);
-	printf("%d\n", n);
-}
-void AVL::print_stream(std::ostream &out)
-{
-	out << n << '\n';
-    size_t ind = 0;
-    print_stream_rq(root, ind, out);
-	out << n;
-}
-
-void AVL::full_print_rq(Node *cur, size_t &ind)
-{
-	if(cur == nullptr) return;
-	full_print_rq(cur->l, ind);
-	size_t ind_left = ind;
-	full_print_rq(cur->r, ind);
-	size_t ind_right = ind;
-    
-    ind++;
-
-    printf("%-2zu - x=%-2" TREE_TYPE_SP " sum=%-3" TREE_TYPE_SP " h=%-2zu d=%-2zu b=%-2hhd -", ind, cur->x, cur->sum, cur->h, cur->deep, cur->b);
-
-    if(cur->p)
-    	printf(" p=%-2" TREE_TYPE_SP "", cur->p->x);
-    else
-    	printf(" pnot");
-
-    if(cur->l)
-        printf(" (%2zu)", ind_left);
-    else
-        printf(" (-1)");
-
-    if(cur->r)
-        printf(" (%2zu)", ind_right);
-    else
-        printf(" (-1)");
-    printf("\n");
-}
-
-void AVL::print_stream_rq(Node *cur, size_t &ind, std::ostream &out)
-{
-	if(cur == nullptr) return;
-	print_stream_rq(cur->l, ind, out);
-	size_t ind_left = ind;
-	print_stream_rq(cur->r, ind, out);
-	size_t ind_right = ind;
-    
-    ind++;
-
-    out << cur->x;
-    out << ' ' << (cur->l ? (int)ind_left 	: -1);
-    out << ' ' << (cur->r ? (int)ind_right	: -1);
-    out << '\n';
-}
 void AVL::swap_val(Node *a, Node *b)
 {
 	T buf = a->x;
@@ -455,8 +370,8 @@ void AVL::swap_childs(Node *cur)
 
 void AVL::restore_childs(Node *cur)
 {
-	if(cur->r) {cur->r->p = cur; cur->r->deep = cur->deep + 1;}
-	if(cur->l) {cur->l->p = cur; cur->l->deep = cur->deep + 1;}
+	if(cur->r) {cur->r->p = cur;}
+	if(cur->l) {cur->l->p = cur;}
 }
 
 void AVL::balancing_node(Node* cur)
@@ -555,16 +470,74 @@ void AVL::balancing_tree(Node *cur_root)
 	if (cur_root->b == -2)
 	{
 		if 		(cur_root->r->b == -1 || cur_root->r->b == 0)	small_left_rotation(cur_root);
-		else if (cur_root->r->b == 1)							large_left_rotation(cur_root);
-		else {printf("Error balance AVL, b = -2, b right = %d\n", cur_root->r->b);}
+		else if (cur_root->r->b == 1)							large_left_rotation(cur_root);	
+		//else {printf("Error balance AVL, b = -2, b right = %d\n", cur_root->r->b);}
 	}
 	else if (cur_root->b == 2)
 	{
 		if 		(cur_root->l->b == 1 || cur_root->l->b == 0)	small_right_rotation(cur_root);
 		else if (cur_root->l->b == -1)							large_right_rotation(cur_root);
-		else {printf("Error balance AVL, b = 2, b left = %d\n", cur_root->l->b);}
+		//else {printf("Error balance AVL, b = 2, b left = %d\n", cur_root->l->b);}
 	}
-	else if (cur_root->b > 2 || cur_root->b < -2) {printf("Error balance, b = %d\n", cur_root->b);}
+	//else if (cur_root->b > 2 || cur_root->b < -2) {printf("Error balance, b = %d\n", cur_root->b);}
+}
+
+void AVL::full_print()
+{
+	printf("n = %zu\n", n);
+    size_t ind = 0;
+    full_print_rq(root, ind);
+	printf("%d\n", n);
+}
+void AVL::full_print_rq(Node *cur, size_t &ind)
+{
+	if(cur == nullptr) return;
+	full_print_rq(cur->l, ind);
+	size_t ind_left = ind;
+	full_print_rq(cur->r, ind);
+	size_t ind_right = ind;
+    
+    ind++;
+
+    printf("%-2zu - x=%-2" TREE_TYPE_SP " sum=%-3" TREE_TYPE_SP " h=%-2zu b=%-2hhd -", ind, cur->x, cur->sum, cur->h, cur->b);
+
+    if(cur->p)
+    	printf(" p=%-2" TREE_TYPE_SP "", cur->p->x);
+    else
+    	printf(" pnot");
+
+    if(cur->l)
+        printf(" (%2zu)", ind_left);
+    else
+        printf(" (-1)");
+
+    if(cur->r)
+        printf(" (%2zu)", ind_right);
+    else
+        printf(" (-1)");
+    printf("\n");
+}
+void AVL::print_stream(std::ostream &out)
+{
+	out << n << '\n';
+    size_t ind = 0;
+    print_stream_rq(root, ind, out);
+	out << n;
+}
+void AVL::print_stream_rq(Node *cur, size_t &ind, std::ostream &out)
+{
+	if(cur == nullptr) return;
+	print_stream_rq(cur->l, ind, out);
+	size_t ind_left = ind;
+	print_stream_rq(cur->r, ind, out);
+	size_t ind_right = ind;
+    
+    ind++;
+
+    out << cur->x;
+    out << ' ' << (cur->l ? (int)ind_left 	: -1);
+    out << ' ' << (cur->r ? (int)ind_right	: -1);
+    out << '\n';
 }
 
 int main()
@@ -595,7 +568,7 @@ int main()
                 if(prev_op == '+')
             	    tree.insert(x);
             	else
-            		tree.insert(((TREE_TYPE_SUM)(x + prev_res%1000000000))%1000000000);
+            		tree.insert((x + prev_res)%1000000000);
 
             	prev_op = '+';
 				break;

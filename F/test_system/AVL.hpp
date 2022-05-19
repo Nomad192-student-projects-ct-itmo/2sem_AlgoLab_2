@@ -6,20 +6,20 @@ class AVL
 {
 private:
 	typedef TREE_TYPE T;
-	typedef TREE_TYPE_SUM TS;	
+	typedef TREE_TYPE_SUM TS;
+
 	struct Node
 	{
 		T x;
 		signed char b = 0;
 		size_t h = 1;
-		size_t deep;
 		TS sum = 0;
 		Node *p;
 		Node *l = nullptr;
 		Node *r = nullptr;
 
-		explicit Node(T &x) : x(x), p(nullptr), deep(1) {}
-		Node(T &x, Node *p) : x(x), p(p), deep(p->deep + 1) {}
+		explicit Node(T &x) : x(x), p(nullptr) {}
+		Node(T &x, Node *p) : x(x), p(p) {}
 		~Node()
 		{
 			delete l;
@@ -48,7 +48,6 @@ private:
 	void del_node(Node *cur);
 	bool next_below(Node *cur, T x, Node **res_node, T *res, size_t s_deep, size_t *deep);
 	bool prev_below(Node *cur, T x, Node **res_node, T *res, size_t s_deep, size_t *deep);
-
 
     void fix_balance_top(Node *cur);
 	void full_print_rq(Node *cur, size_t &ind);
