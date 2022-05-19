@@ -1,13 +1,41 @@
 #include "AlmostTree.hpp"
+#include "TestTree.hpp"
 #include "F_Test.hpp"
 #include <ctime>
+
+static bool testIsTree(class AVL &tree)
+{
+	std::stringstream tree_output;
+	tree.print_stream(tree_output);
+
+	size_t n;
+	tree_output >> n;
+	TestTree test_tree(n);
+
+	for (size_t i = 0; i < n; i++)
+	{
+		TREE_TYPE x;
+		size_t l, r;
+		tree_output >> x >> l >> r;
+		if((l != -1 && r != -1) && l >= r)
+			return false; 
+		test_tree.add(TestTree::Node{x, --l, --r});
+	}
+	size_t root;
+	tree_output >> root;
+	return test_tree.isTree(--root);
+}
 
 struct Req
 {
 	enum Type
 	{
 		INSERT,
-		SUM,  
+		DEL,
+		EXISTS,
+		NEXT,
+		PREV, 
+		SUM, 		
 	};
 	Type type;
 	TREE_TYPE x;
@@ -41,6 +69,26 @@ static void print_error(const char *error_str, size_t length, Req *req_arr, AVL 
 				printf("insert %" TREE_TYPE_SP "\n", req_arr[i].x);
 				break;
 			}
+			case Req::Type::DEL:
+			{
+				printf("delete %u\n", req_arr[i].x);
+				break;
+			}
+			case Req::Type::EXISTS:
+			{
+				printf("exists %u\n", req_arr[i].x);
+				break;
+			}
+			case Req::Type::NEXT:
+			{
+				printf("next %u\n", req_arr[i].x);
+				break;
+			}
+			case Req::Type::PREV:
+			{
+				printf("prev %u\n", req_arr[i].x);
+				break;
+			}
 			case Req::Type::SUM:
 			{
 				printf("sum %" TREE_TYPE_SP " %" TREE_TYPE_SP "\n", req_arr[i].x, req_arr[i].y);
@@ -62,6 +110,38 @@ static void print_error(const char *error_str, size_t length, Req *req_arr, AVL 
                 trace.insert(req_arr[i].x);
 				break;
 			}
+			case  Req::Type::DEL:
+			{
+				printf("delete %u\n", req_arr[i].x);
+                trace.del(req_arr[i].x);
+				break;
+			}
+			case Req::Type::EXISTS:
+			{
+				printf("exists %u\n", req_arr[i].x);
+                trace.exists(req_arr[i].x);
+				break;
+			}
+			case Req::Type::NEXT:
+			{
+				printf("next %u\n", req_arr[i].x);
+				TREE_TYPE res_x;
+                if(trace.next(req_arr[i].x, &res_x))
+					printf("%" TREE_TYPE_SP "\n", res_x);
+				else
+					printf("none\n");
+				break;
+			}
+			case Req::Type::PREV:
+			{
+				printf("prev %u\n", req_arr[i].x);
+				TREE_TYPE res_x;
+                if(trace.prev(req_arr[i].x, &res_x))
+					printf("%" TREE_TYPE_SP "\n", res_x);
+				else
+					printf("none\n");
+				break;
+			}			
 			case  Req::Type::SUM:
 			{
 				printf("sum %" TREE_TYPE_SP " %" TREE_TYPE_SP "\n", req_arr[i].x, req_arr[i].y);
@@ -104,7 +184,7 @@ bool full_test()
         	{
         		//if(i%(length/100) == 0) printf("%zu\n", i/(length/100));
 
-        		req_arr[i] = Req(Req::Type(rand() % 2), (rand() % RANGE_VAL) + OFFSET_VAL);
+        		req_arr[i] = Req(Req::Type(rand() % 2 ? Req::Type::INSERT : Req::Type::SUM), (rand() % RANGE_VAL) + OFFSET_VAL);
         		switch(req_arr[i].type)
         		{
         			case Req::Type::INSERT: 
@@ -116,6 +196,76 @@ bool full_test()
         					update_loadbar(length, n_attempt);
         					printf("\ttree = %d, test = %d\n", res, res_test);        					
 							print_error("insert", i+1, req_arr, &tree);
+							delete[] req_arr;
+							return false;
+        				}
+        				break;
+        			}
+        			case Req::Type::DEL:
+        			{
+        				bool res 		= tree.del			(req_arr[i].x); 
+        				bool res_test 	= test_tree.del 	(req_arr[i].x);
+        				if(res != res_test)
+        				{
+        					printf("\ttree = %d, test = %d\n", res, res_test);
+							print_error("delete", length, req_arr, &tree);
+							delete[] req_arr;
+							return false;
+        				}
+        				break;
+       				}
+        			case Req::Type::EXISTS: 
+					{    				
+        				bool res 		= tree.exists		(req_arr[i].x); 
+        				bool res_test 	= test_tree.exists 	(req_arr[i].x);
+        				if(res != res_test)
+        				{
+        					printf("\ttree = %d, test = %d\n", res, res_test);        				
+							print_error("exists", length, req_arr, &tree);
+							delete[] req_arr;
+							return false;
+        				}
+        				break;
+        			}
+        			case Req::Type::NEXT: 
+					{    				
+						TREE_TYPE res_x;
+						TREE_TYPE res_test_x;
+        				bool res 		= tree.next			(req_arr[i].x, &res_x); 
+        				bool res_test 	= test_tree.next 	(req_arr[i].x, &res_test_x);
+        				if(res != res_test)
+        				{
+        					printf("\ttree = %d, test = %d\n", res, res_test);        				
+							print_error("exists", length, req_arr, &tree);
+							delete[] req_arr;
+							return false;
+        				}
+        				if(res && (res_x != res_test_x))
+        				{
+        					printf("\ttree = %" TREE_TYPE_SP", test = %" TREE_TYPE_SP"\n", res_x, res_test_x);        				
+							print_error("exists", length, req_arr, &tree);
+							delete[] req_arr;
+							return false;
+        				}
+        				break;
+        			}
+        			case Req::Type::PREV: 
+					{    				
+						TREE_TYPE res_x;
+						TREE_TYPE res_test_x;
+        				bool res 		= tree.prev			(req_arr[i].x, &res_x); 
+        				bool res_test 	= test_tree.prev 	(req_arr[i].x, &res_test_x);
+        				if(res != res_test)
+        				{
+        					printf("\ttree = %d, test = %d\n", res, res_test);        				
+							print_error("exists", length, req_arr, &tree);
+							delete[] req_arr;
+							return false;
+        				}
+        				if(res && (res_x != res_test_x))
+        				{
+        					printf("\ttree = %" TREE_TYPE_SP", test = %" TREE_TYPE_SP"\n", res_x, res_test_x);        				
+							print_error("exists", length, req_arr, &tree);
 							delete[] req_arr;
 							return false;
         				}
@@ -136,9 +286,20 @@ bool full_test()
         				}
         				break;
        				}
-
         		}
+	        	/*if(!testIsTree(tree))
+		    	{
+					print_error("tree", i+1, req_arr, &tree);
+					delete[] req_arr;
+					return false;
+		    	}*/
         	}
+			/*if(!testIsTree(tree))
+	    	{
+				print_error("tree", i+1, req_arr, &tree);
+				delete[] req_arr;
+				return false;
+	    	}*/
     	}
     }
     delete[] req_arr;
